@@ -6,19 +6,18 @@ from pylut.config import CONFIG
 def mkdir(scripts_dict):
     """ creates a folder and returns the Path
     """
+    assert (
+        "name" in scripts_dict
+    ), "the scripts dict needs a name, make sure you use the @autoname decorator in the function that returns your dict of scripts"
     dirpath = CONFIG["workspace"] / scripts_dict["name"]
     dirpath.mkdir(exist_ok=True)
     scripts_dict["dirpath"] = dirpath
     return dirpath
 
 
-def exists(scripts_dict):
-    dirpath = CONFIG["workspace"] / scripts_dict["name"]
-    return dirpath.exists()
-
-
 def write_scripts(scripts_dict):
-    """ saves a dict of scripts into a path
+    """ saves a dict of scripts into a dirpath folder
+    the dirpath folder needs to be defined in the dict of scripts
     """
     dirpath = scripts_dict.get("dirpath", mkdir(scripts_dict))
     dirpath = pathlib.Path(dirpath)

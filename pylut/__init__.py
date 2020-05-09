@@ -4,47 +4,14 @@ import pylut.plot as plot
 from pylut.autoname import autoname
 from pylut.config import CONFIG
 from pylut.loadmat import loadmat
-from pylut.write_scripts import exists, mkdir, write_scripts
-
-
-def run_mode(scripts_dict, session=None, return_session=False):
-    """ runs a dict of scripts in a Lumerical session
-    """
-    import lumapi
-
-    dirpath = scripts_dict.get("dirpath", write_scripts(scripts_dict))
-
-    s = session or lumapi.MODE()
-    s.cd(str(dirpath))
-
-    s.eval(scripts_dict["main.lsf"])
-
-    if return_session:
-        return s
-
-
-def run_fdtd(scripts_dict, session=None, return_session=False):
-    """ runs a dict of scripts in a Lumerical session
-    """
-    import lumapi
-
-    dirpath = scripts_dict.get("dirpath", write_scripts(scripts_dict))
-
-    s = session or lumapi.FDTD()
-    s.cd(str(dirpath))
-
-    s.eval(scripts_dict["main.lsf"])
-
-    if return_session:
-        return s
-
+from pylut.run import run_fdtd, run_mode
+from pylut.write_scripts import mkdir, write_scripts
 
 __version__ = "0.0.1"
 __author__ = "Joaquin <j>"
 __all__ = [
     "CONFIG",
     "autoname",
-    "exists",
     "loadmat",
     "mkdir",
     "run_fdtd",
@@ -55,4 +22,6 @@ __all__ = [
 
 
 if __name__ == "__main__":
-    mkdir("joaquin")
+    scripts_dict = dict(name="sample_sim")
+    dirpath = mkdir(scripts_dict)
+    print(dirpath.exists())

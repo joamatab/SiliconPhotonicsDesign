@@ -11,6 +11,8 @@ def loadmat(matlab_file_path="results.mat"):
     """ reads a dirpath or a matlab file path
     it can also accept a dict of scripts containing dirpath
     returns a dict with the results
+
+    you have to make sure that in your scripts you save the results in resuls.mat
     """
 
     if not str(matlab_file_path).endswith(".mat"):
@@ -34,7 +36,7 @@ def loadmat(matlab_file_path="results.mat"):
 
 
 def write_dict(d, filepath="results.json"):
-    """ convert a dict to JSON """
+    """ convert dict to JSON """
     if not filepath.endswith(".mat"):
         filepath = CONFIG["workspace"] / filepath / "results.json"
 

@@ -79,6 +79,8 @@ def sweep(**kwargs):
 
 @autoname
 def sparameters(**kwargs):
+    """ returns a dictionary with scripts for calculating the Sparameters of a grating coupler
+    """
     d = sweep(**kwargs)
     d.pop("GC_sweeps.lsf")
     d["main.lsf"] = "\n".join(["GC_init;", "GC_S_extraction;"])
