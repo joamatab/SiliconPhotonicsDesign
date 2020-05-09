@@ -1,0 +1,225 @@
+GC_S_extraction.lsf: "# S Parameter extraction for the grating coupler\n# Port 1 =\
+  \ fibre\n# Port 2 = waveguide\n\nnewproject;\nredrawoff;\n\nGC_init;\nGC_setup_fibre;\
+  \ \n\n#from waveguide to fibre\nselect(\"waveguide_source\");  set(\"enabled\",1);\n\
+  select(\"fibre::fibre_mode\"); set(\"enabled\",0);\nrun;\n\nT = getresult(\"waveguide\"\
+  ,\"expansion for T\");\nfibre = getresult(\"fibre::fibre_modeExpansion\",\"expansion\
+  \ for fibre_top\");\nf = T.f;\nS22 = T.b / T.a;\nS12 = fibre.a*sqrt(fibre.N) / (T.a*sqrt(T.N));\n\
+  \n#from fibre to waveguide\nswitchtolayout;\nselect(\"waveguide_source\");  set(\"\
+  enabled\",0);\nselect(\"fibre::fibre_mode\"); set(\"enabled\",1);\nrun;\n\nT = getresult(\"\
+  waveguide\",\"expansion for T\");\nfibre = getresult(\"fibre::fibre_modeExpansion\"\
+  ,\"expansion for fibre_top\");\nS11 = fibre.a / fibre.b;\nS21 =  T.b*sqrt(T.N) /\
+  \ (fibre.b*sqrt(fibre.N));\n\nplot(c/f*1e6,10*log10(abs([S12, S21,S11,S22])),'Wavelength\
+  \ (micron)','Transmission/Reflection (dB)');\nlegend('S12','S21','S11','S22');\n\
+  plot(c/f*1e6,unwrap(angle([S12, S21,S11,S22])),'Wavelength (micron)','Phase (rad)');\n\
+  legend('S12','S21','S11','S22');\n\n# export S parameters for INTERCONNECT\nSdata\
+  \ = [ f, abs(S11), unwrap(angle(S11)), abs(S21), unwrap(angle(S21)), abs(S12), unwrap(angle(S12)),\
+  \ abs(S22), unwrap(angle(S22)) ];\n\nfilename = \"GC_Sparam.dat\";\nrm(filename);\n\
+  format long;\nwrite(filename,num2str(Sdata));\nformat short;\n\nmatlabsave (\"GC_Sparam\"\
+  );\n"
+GC_draw.lsf: "# 2D Grating Coupler Model\n\n# Draw GC\nredrawoff;\ngap=period*(1-ff);\
+  \ # etched region of the grating\n\n# add GC base\naddrect;\nset('name','GC_base');\n\
+  set('material',material);\nset('x max',(gc_number+1)*period);\nset('x min',0);\n\
+  set('y',0.5*(thick_Si-etch_depth));\nset('y span',thick_Si-etch_depth);\n\n# add\
+  \ GC teeth;\nfor(i=0:gc_number)\n{\n  addrect;\n  set('name','GC_tooth');\n  set('material',material);\n\
+  \  set('y',0.5*thick_Si);\n  set('y span',thick_Si);\n  set('x min',gap+i*period);\n\
+  \  set('x max',period+i*period);\n}\nselectpartial('GC');\naddtogroup('GC');\n\n\
+  \n# draw silicon substrate;\naddrect;\nset('name','Si_sub');\nset('material','Si\
+  \ (Silicon) - Dispersive & Lossless');\nset('x max',30e-6);\nset('x min', -20e-6);\n\
+  set('y',-1*(thick_BOX+0.5*Si_substrate));\nset('y span',Si_substrate);\nset('alpha',0.2);\n\
+  \n#draw burried oxide;\naddrect;\nset('name','BOX');\nset('material','SiO2 (Glass)\
+  \ - Const');\nset('x max',30e-6);\nset('x min',-20e-6);\nset('y min',-thick_BOX);\n\
+  set('y max',thick_Clad);\nset('override mesh order from material database',true);\n\
+  set('mesh order',3);\nset('alpha',0.3);\n\n#draw waveguide;\naddrect;\nset('name','WG');\n\
+  set('material','Si (Silicon) - Dispersive & Lossless');\nset('x min',-20e-6);\n\
+  set('x max', 0);\nset('y',0.11e-6);\nset('y span',0.22e-6);\n"
+GC_init.lsf: '# define grating coupler parameters
+
+  period = 6.6e-07;
+
+  ff = 0.5;
+
+  gc_number = 50;
+
+
+  # define wafer and waveguide structure
+
+  thick_Si = 2.2e-07;
+
+  etch_depth = 7e-08;
+
+  thick_BOX = 2e-06;
+
+  thick_Clad = 2e-06;
+
+  Si_substrate = 2e-06;
+
+  materials;
+
+  material = "Si (Silicon) - Dispersive & Lossless";
+
+  width_wg = 5e-07;
+
+
+  # define input optical source parameters
+
+  theta0 = 20;
+
+  polarization=''TE'';
+
+  lambda=1.55e-06;
+
+  Position=4.5e-06;
+
+
+  # define simulation parameters
+
+  wl_span=0.3e-6;           # wavelength span
+
+  mesh_accuracy=3;          # FDTD simulation mesh accuracy
+
+  frequency_points=100;     # global frequency points
+
+  simulation_time=1000e-15; # maximum simulation time [s]
+
+
+  # define optical fibre parameters
+
+  core_index=1.4682;
+
+  cladding_index=1.4629;
+
+  core_diameter=8.2e-6;
+
+  cladding_diameter=100e-6;'
+GC_setup_Gaussian.lsf: "# 2D Grating Coupler Model with Gaussian input\n\nGC_draw;\
+  \  # Draw GC\n\n# add simulation region;\naddfdtd;\nset('dimension','2D');\nset('x\
+  \ max',15e-6);\nset('x min',-6e-6);\nset('y min',-(thick_BOX+0.2e-6));\nset('y max',thick_Clad+2e-6);\n\
+  set('mesh accuracy',mesh_accuracy);\nset('simulation time',simulation_time);\n\n\
+  # add monitor;\naddpower;\nset('name','T');\nset('monitor type','2D X-normal');\n\
+  set('x',-5e-6);\nset('y',0.5*thick_Si);\nset('y span',1e-6);\n\n# add waveguide\
+  \ mode expansion monitor\naddmodeexpansion;\nset('name','waveguide');\nset('monitor\
+  \ type','2D X-normal');\nsetexpansion('T','T');\nset('x',-5e-6);\nset('y',0.5*thick_Si);\n\
+  set('y span',1e-6);\n\n# add Gaussian mode\naddgaussian;\nset('name','fibre');\n\
+  set('injection axis','y');\nset('x',Position);\nset('x span', 16e-6);\nset('direction','Backward');\n\
+  set('y',thick_Clad+1e-6);\n\nif(polarization=='TE'){\n  set('polarization angle',90);\n\
+  }\nelse{\n  set('polarization angle',0);\n}\n\nset('angle theta',-theta0);\nset('center\
+  \ wavelength',lambda);\nset('wavelength span',wl_span);\nset('waist radius w0',4.5e-6);\n\
+  set('distance from waist',10e-6);\n\n# global properties\nsetglobalmonitor('frequency\
+  \ points',frequency_points);\nsetglobalmonitor('use linear wavelength spacing',1);\n\
+  setglobalmonitor('use source limits',1);\nsetglobalsource('center wavelength',lambda);\n\
+  setglobalsource('wavelength span',wl_span);\n\nsave('GC_Gaussian');\n"
+GC_setup_fibre.lsf: "# 2D Grating Coupler Model with Fibre\n\nGC_draw;  # Draw GC\n\
+  \n# add simulation region;\naddfdtd;\nset('dimension','2D');\nset('x max',15e-6);\n\
+  set('x min',-3.5e-6);\nset('y min',-(thick_BOX+0.2e-6));\nset('y max',thick_Clad+2e-6);\n\
+  set('mesh accuracy',mesh_accuracy);\nset('simulation time',simulation_time);\n\n\
+  #add waveguide mode source;\naddmode;\nset('name','waveguide_source');\nset('x',-3e-6);\n\
+  set('y',0.5*thick_Si);\nset('y span',2e-6);\nset('direction','Forward');\nset('use\
+  \ global source settings',true);\nset('enabled',false);\n\n\n#add fibre;\ntheta=asin(sin(theta0*pi/180)/core_index)*180/pi;\n\
+  r1 = core_diameter/2;\nr2 = cladding_diameter/2;\nif(theta >  89) { theta = 89;\
+  \ }\nif(theta < -89) { theta = -89; } \n\nthetarad = theta*pi/180;\nL = 20e-6/cos(thetarad);\n\
+  \nV1 = [ -r1/cos(thetarad),  0;\n        r1/cos(thetarad),  0;\n        r1/cos(thetarad)+L*sin(thetarad),\
+  \ L*cos(thetarad);\n        -r1/cos(thetarad)+L*sin(thetarad), L*cos(thetarad)\n\
+  \     ];\n\nV2 = [ -r2/cos(thetarad),  0;\n        r2/cos(thetarad),  0;\n     \
+  \   r2/cos(thetarad)+L*sin(thetarad), L*cos(thetarad);\n        -r2/cos(thetarad)+L*sin(thetarad),\
+  \ L*cos(thetarad)\n     ];\n\naddpoly;\nset('name','fibre_core');\nset('x',0); set('y',0);\n\
+  set('vertices',V1);\nset('index',core_index);\n\naddpoly;\nset('name','fibre_cladding');\n\
+  set('override mesh order from material database',1);\nset('mesh order',3);\nset('x',0);\
+  \ set('y',0);\nset('vertices',V2);\nset('index',cladding_index);\n\naddmode;\nset('name','fibre_mode');\n\
+  set('injection axis','y-axis');\nset('direction','Backward');\nset('use global source\
+  \ settings',1);\nset('theta',-theta);\nspan = 15*r1;\nset('x span',span);\nd = 0.4e-6;\n\
+  set('x',d*sin(thetarad));\nset('y',d*cos(thetarad));\nset('rotation offset',abs(span/2*tan(thetarad)));\n\
+  \naddpower;\nset('name','fibre_top');\nset('x span',span);\nd = 0.2e-6;\nset('x',d*sin(thetarad));\n\
+  set('y',d*cos(thetarad));\n\naddmodeexpansion;\nset('name','fibre_modeExpansion');\n\
+  set('monitor type','2D Y-normal');\nsetexpansion('fibre_top','fibre_top');\nset('x\
+  \ span',span);\nset('x',d*sin(thetarad));\nset('y',d*cos(thetarad));\nset('theta',-theta);\n\
+  set('rotation offset',abs(span/2*tan(thetarad)));\nset('override global monitor\
+  \ settings',false);\n\nselectpartial('fibre');\naddtogroup('fibre');\nselectpartial('::fibre_modeExpansion');\n\
+  setexpansion('fibre_top','::model::fibre::fibre_top');\n\nunselectall;\nselect('fibre');\n\
+  set('x',Position);\nset('y',thick_Clad+1e-6);\n\n# add monitor;\naddpower;\nset('name','T');\n\
+  set('monitor type','2D X-normal');\nset('x',-2.8e-6);\nset('y',0.5*thick_Si);\n\
+  set('y span',1e-6);\n\n# add waveguide mode expansion monitor\naddmodeexpansion;\n\
+  set('name','waveguide');\nset('monitor type','2D X-normal');\nsetexpansion('T','T');\n\
+  set('x',-2.9e-6);\nset('y',0.5*thick_Si);\nset('y span',1e-6);\n\n\nif (polarization=='TE'){\n\
+  \    select('fibre::fibre_mode'); set('mode selection','fundamental TM');\n    select('fibre::fibre_modeExpansion');\
+  \ set('mode selection','fundamental TM');\n    select('waveguide_source'); set('mode\
+  \ selection','fundamental TM');\n    select('waveguide'); set('mode selection','fundamental\
+  \ TM');\n} else {\n    select('fibre::fibre_mode'); set('mode selection','fundamental\
+  \ TE');\n    select('fibre::fibre_modeExpansion'); set('mode selection','fundamental\
+  \ TE');\n    select('waveguide_source'); set('mode selection','fundamental TE');\n\
+  \    select('waveguide'); set('mode selection','fundamental TE');\n}\n# global properties\n\
+  setglobalmonitor('frequency points',frequency_points);\nsetglobalmonitor('use linear\
+  \ wavelength spacing',1);\nsetglobalmonitor('use source limits',1);\nsetglobalsource('center\
+  \ wavelength',lambda);\nsetglobalsource('wavelength span',wl_span);\n\nsave('GC_fibre');\n"
+main.lsf: 'GC_init;
+
+  GC_S_extraction;'
+main.py: "\n\nimport pathlib\nimport json\nimport lumapi\n\n\ndirpath = pathlib.Path(__file__).parent.absolute()\n\
+  \ns = lumapi.FDTD()\ns.cd(str(dirpath))\ns.eval(\"main;\")\n\nd = {k: list(abs(s.getv(k).flatten()))\
+  \ for k in [\"S11\", \"S12\", \"S21\", \"S22\", \"f\"]}\n\nwith open(dirpath / \"\
+  GC_sparameters.json\", \"w\") as f:\n    f.write(json.dumps(d))\n\n    "
+materials.lsf: '# materials.lsf - creates a dispersive material model in Lumerical.
+
+  matname = "Si (Silicon) - Dispersive & Lossless";
+
+  newmaterial = addmaterial("Lorentz");
+
+  setmaterial(newmaterial,"name",matname);
+
+  setmaterial(matname,"Permittivity",7.98737492);
+
+  setmaterial(matname,"Lorentz Linewidth",1e8);
+
+  setmaterial(matname,"Lorentz Resonance",3.93282466e+15);
+
+  setmaterial(matname,"Lorentz Permittivity",3.68799143);
+
+  setmaterial(matname,"color",[0.85, 0, 0, 1]); # red
+
+
+  matname = "Air (1)";
+
+  if (1) { newmaterial = addmaterial("Dielectric"); }
+
+  setmaterial(newmaterial,"name",matname);
+
+  setmaterial(matname,"Refractive Index",1);
+
+  setmaterial(matname,"color",[0.85, 0.85, 0, 1]);
+
+
+  matname = "SiO2 (Glass) - Dispersive & Lossless";
+
+  newmaterial = addmaterial("Lorentz");
+
+  setmaterial(newmaterial,"name",matname);
+
+  setmaterial(matname,"Permittivity",2.119881);
+
+  setmaterial(matname,"Lorentz Linewidth",1e10);
+
+  setmaterial(matname,"Lorentz Resonance",3.309238e+13);
+
+  setmaterial(matname,"Lorentz Permittivity", 49.43721);
+
+  setmaterial(matname,"color",[0.5, 0.5, 0.5, 1]); # grey
+
+
+  matname = "SiO2 (Glass) - Const";
+
+  newmaterial = addmaterial("Dielectric");
+
+  setmaterial(newmaterial,"name",matname);
+
+  setmaterial(matname,"Permittivity",1.444^2);
+
+  setmaterial(matname,"color",[0.5, 0.5, 0.5, 1]); # grey
+
+  '
+name: sparameters
+name_function: sparameters
+settings.json: '{"period": 6.6e-07, "ff": 0.5, "n_gratings": 50, "wg_height": 2.2e-07,
+  "etch_depth": 7e-08, "box_height": 2e-06, "clad_height": 2e-06, "substrate_height":
+  2e-06, "material": "Si (Silicon) - Dispersive & Lossless", "wg_width": 5e-07, "polarization":
+  "TE", "wavelength": 1.55e-06, "gc_position": 4.5e-06, "fiber_angle_deg": 20, "draw_source_script_name":
+  "GC_setup_Gaussian", "sweep_variable": "period", "sweep_start": 6.2e-07, "sweep_stop":
+  7e-07, "sweep_points": 5}'

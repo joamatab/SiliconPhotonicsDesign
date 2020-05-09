@@ -1,0 +1,32 @@
+# define grating coupler parameters
+period = {{ period }};
+ff = {{ ff }};
+gc_number = {{ n_gratings }};
+
+# define wafer and waveguide structure
+thick_Si = {{ wg_height }};
+etch_depth = {{ etch_depth }};
+thick_BOX = {{ box_height }};
+thick_Clad = {{ clad_height }};
+Si_substrate = {{ substrate_height }};
+materials;
+material = "{{ material }}";
+width_wg = {{ wg_width }};
+
+# define input optical source parameters
+theta0 = {{ fiber_angle_deg }};
+polarization='{{ polarization }}';
+lambda={{ wavelength }};
+Position={{ gc_position }};
+
+# define simulation parameters
+wl_span=0.3e-6;           # wavelength span
+mesh_accuracy=3;          # FDTD simulation mesh accuracy
+frequency_points=100;     # global frequency points
+simulation_time=1000e-15; # maximum simulation time [s]
+
+# define optical fibre parameters
+core_index=1.4682;
+cladding_index=1.4629;
+core_diameter=8.2e-6;
+cladding_diameter=100e-6;
