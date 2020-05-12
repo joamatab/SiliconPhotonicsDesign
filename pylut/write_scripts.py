@@ -24,9 +24,10 @@ def write_scripts(scripts_dict):
     dirpath.mkdir(exist_ok=True)
 
     for script_name, script in scripts_dict.items():
-        if script_name.endswith(".lsf") or script_name.endswith(".py"):
+        if script_name.endswith((".lsf", ".json", ".py")):
             with open(dirpath / script_name, "w") as f:
                 f.write(script)
+    print(f"write scripts in {dirpath}")
     return dirpath
 
 

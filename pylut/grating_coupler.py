@@ -42,6 +42,28 @@ draw_source_script_names = ["GC_setup_Gaussian", "GC_setup_fibre"]
 @autoname
 def sweep(**kwargs):
     """ returns a dictionary with scripts for a grating coupler sweep
+
+    Args:
+        period: 0.66e-6
+        ff: 0.5
+        n_gratings: 50
+        wg_height: 220e-9
+        etch_depth: 70e-9
+        box_height: 2e-6
+        clad_height: 2e-6
+        substrate_height: 2e-6
+        material: Si (Silicon) - Dispersive & Lossless"
+        wg_width: 500e-9
+        polarization: TE"
+        wavelength: 1550e-9
+        gc_position: 4.5e-6
+        fiber_angle_deg: 20
+        draw_source_script_name: GC_setup_Gaussian"
+        sweep_variable: period"
+        sweep_start: 0.62e-6
+        sweep_stop: 0.7e-6
+        sweep_points: 5
+
     """
     if "sweep_variable" in kwargs:
         assert (
@@ -80,6 +102,27 @@ def sweep(**kwargs):
 @autoname
 def sparameters(**kwargs):
     """ returns a dictionary with scripts for calculating the Sparameters of a grating coupler
+
+    Args:
+        period: 0.66e-6
+        ff: 0.5
+        n_gratings: 50
+        wg_height: 220e-9
+        etch_depth: 70e-9
+        box_height: 2e-6
+        clad_height: 2e-6
+        substrate_height: 2e-6
+        material: Si (Silicon) - Dispersive & Lossless"
+        wg_width: 500e-9
+        polarization: TE"
+        wavelength: 1550e-9
+        gc_position: 4.5e-6
+        fiber_angle_deg: 20
+        draw_source_script_name: GC_setup_Gaussian"
+        sweep_variable: period"
+        sweep_start: 0.62e-6
+        sweep_stop: 0.7e-6
+        sweep_points: 5
     """
     d = sweep(**kwargs)
     d.pop("GC_sweeps.lsf")
@@ -134,6 +177,11 @@ def test_sparameters(data_regression):
     data_regression.check(sparameters())
 
 
+def sparameters_te():
+    """ for gdsfactory default TE grating """
+    return sparameters(fiber_angle_deg=15, period=682e-9, ff=343 / 682)
+
+
 if __name__ == "__main__":
     import pylut
 
@@ -144,8 +192,11 @@ if __name__ == "__main__":
         sweep_points=3,
     )
     scripts = sparameters()
-    # print(scripts['main.py'])
+
+    scripts = sparameters_te()
     pylut.write_scripts(scripts)
+
+    # print(scripts['main.py'])
     # print(scripts["dirpath"])
-    print(scripts)
+    # print(scripts)
     # pylut.run_fdtd(scripts)
