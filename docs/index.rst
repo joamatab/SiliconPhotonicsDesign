@@ -1,9 +1,9 @@
-pylut
+pylum
 ===================================
 
 
 .. toctree::
     :maxdepth: 2
 
-    pylut
+    pylum
     grating_coupler

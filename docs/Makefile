@@ -1,6 +1,6 @@
 SPHINXOPTS    =
 SPHINXBUILD   = sphinx-build
-SPHINXPROJ    = pylut
+SPHINXPROJ    = pylum
 SOURCEDIR     = .
 BUILDDIR      = build
 
@@ -17,7 +17,7 @@ help:
 
 upload:
 	mkdir -p site
-	rsync -rv build/html/ site/pylut
+	rsync -rv build/html/ site/pylum
 
 open:
 	open build/html/index.html

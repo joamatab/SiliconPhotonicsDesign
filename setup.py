@@ -2,7 +2,8 @@ import io
 import os
 import re
 
-from setuptools import find_packages, setup
+from setuptools import find_packages
+from setuptools import setup
 
 
 def read(filename):
@@ -18,7 +19,7 @@ def get_install_requires():
 
 
 setup(
-    name="pylut",
+    name="pylum",
     version="0.0.1",
     url="https://github.com/joamatab/SiliconPhotonicsDesign",
     license="MIT",

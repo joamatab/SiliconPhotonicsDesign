@@ -1,6 +1,6 @@
 import shutil
 
-from pylut.write_scripts import write_scripts
+from pylum.write_scripts import write_scripts
 
 
 def cp(scripts_dict, src, dst):

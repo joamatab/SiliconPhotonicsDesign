@@ -1,4 +1,4 @@
-from pylut.write_scripts import write_scripts
+from pylum.write_scripts import write_scripts
 
 
 def run_mode(scripts_dict, session=None, return_session=False):
@@ -24,8 +24,8 @@ def run_fdtd(scripts_dict, session=None, return_session=False):
 
     .. code-block:: python
 
-        import pylut
-        from pylut.grating_coupler import sweep
+        import pylum
+        from pylum.grating_coupler import sweep
 
         scripts_dict = sweep()
         run_fdtd(scripts_dict)
@@ -45,7 +45,7 @@ def run_fdtd(scripts_dict, session=None, return_session=False):
 
 
 if __name__ == "__main__":
-    from pylut.grating_coupler import sweep
+    from pylum.grating_coupler import sweep
 
     scripts_dict = sweep()
     run_fdtd(scripts_dict)

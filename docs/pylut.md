@@ -2,7 +2,7 @@
 
 ```eval_rst
 
-.. automodule:: pylut
+.. automodule:: pylum
     :members: autoname, write_scripts, loadmat, mkdir, run_mode, run_fdtd
 
 ```

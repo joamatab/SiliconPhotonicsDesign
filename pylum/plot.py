@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from pylut.loadmat import loadmat
+
+from pylum.loadmat import loadmat
 
 
 def log(x):
@@ -123,7 +124,7 @@ if __name__ == "__main__":
     # plot_grating_coupler_sweep_center_wavelength("grating_coupler_sweep2")
     # plot_grating_coupler_sweep_efficiency("grating_coupler_sweep2")
 
-    from pylut.grating_coupler import sparameters
+    from pylum.grating_coupler import sparameters
 
     scripts = sparameters()
     plot_sparameters_gc(scripts)

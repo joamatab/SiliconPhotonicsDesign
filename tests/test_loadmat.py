@@ -1,11 +1,11 @@
-import pylut
-from pylut.config import CONFIG
+import pylum
+from pylum.config import CONFIG
 
 
 def test_loadmat(
     matlab_file_path=CONFIG["repo_workspace"] / "grating_coupler_sweep" / "results.mat",
 ):
-    d = pylut.loadmat(matlab_file_path)
+    d = pylum.loadmat(matlab_file_path)
     # print(d.keys())
     assert d["polarization"] == "TE"
 

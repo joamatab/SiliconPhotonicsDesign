@@ -3,7 +3,7 @@
 
 ```eval_rst
 
-.. automodule:: pylut.grating_coupler
+.. automodule:: pylum.grating_coupler
     :members:
 
 ```

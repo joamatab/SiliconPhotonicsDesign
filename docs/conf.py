@@ -1,7 +1,7 @@
 from recommonmark.parser import CommonMarkParser
 from recommonmark.transform import AutoStructify
 
-project = "pylut"
+project = "pylum"
 version = "0.0.1"
 copyright = "2019, Joaquin"
 author = "Joaquin"
@@ -48,6 +48,6 @@ def linkcode_resolve(domain, info):
     if not info["module"]:
         return None
     filename = info["module"].replace(".", "/")
-    return "https://github.com/joamatab/SiliconPhotonicsDesign/pylut/blob/master/{}.py".format(
+    return "https://github.com/joamatab/SiliconPhotonicsDesign/pylum/blob/master/{}.py".format(
         filename
     )

@@ -1,8 +1,9 @@
 import json
 
 import jinja2
-from pylut.autoname import autoname
-from pylut.config import CONFIG
+
+from pylum.autoname import autoname
+from pylum.config import CONFIG
 
 settings = dict(
     period=0.66e-6,
@@ -158,7 +159,7 @@ with open(dirpath / "GC_sparameters.json", "w") as f:
 
 
 def _demo_sweep():
-    import pylut
+    import pylum
 
     scripts = sweep(
         sweep_variable="thick_Si",
@@ -166,7 +167,7 @@ def _demo_sweep():
         sweep_stop=240e-9,
         sweep_points=3,
     )
-    pylut.write_scripts(scripts)
+    pylum.write_scripts(scripts)
 
 
 def test_sweep(data_regression):
@@ -183,7 +184,7 @@ def sparameters_te():
 
 
 if __name__ == "__main__":
-    import pylut
+    import pylum
 
     scripts = sweep(
         sweep_variable="thick_Si",
@@ -194,9 +195,9 @@ if __name__ == "__main__":
     scripts = sparameters()
 
     scripts = sparameters_te()
-    pylut.write_scripts(scripts)
+    pylum.write_scripts(scripts)
 
     # print(scripts['main.py'])
     # print(scripts["dirpath"])
     # print(scripts)
-    # pylut.run_fdtd(scripts)
+    # pylum.run_fdtd(scripts)

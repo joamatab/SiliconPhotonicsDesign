@@ -3,8 +3,9 @@ import pathlib
 
 import h5py
 import numpy as np
-from pylut.config import CONFIG
-from pylut.write_scripts import write_scripts
+
+from pylum.config import CONFIG
+from pylum.write_scripts import write_scripts
 
 
 def loadmat(matlab_file_path="results.mat"):
@@ -49,7 +50,7 @@ def write_dict(d, filepath="results.json"):
 
 
 def test_loadmat():
-    from pylut.grating_coupler import sparameters
+    from pylum.grating_coupler import sparameters
 
     matlab_file_path = (
         CONFIG["repo_path"] / "workspace" / "grating_coupler_sweep" / "results.mat"

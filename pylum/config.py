@@ -2,7 +2,7 @@
 loads a configuration from 3 files, high priority overwrites low priority:
 
 1. A config.yml found in the current working directory (high priority)
-2. ~/.config/pylut.yml specific for the machine
+2. ~/.config/pylum.yml specific for the machine
 3. the default config is in this file (lowest priority)
 
 """
@@ -22,7 +22,7 @@ home = pathlib.Path.home()
 cwd = pathlib.Path.cwd()
 cwd_config = cwd / "config.yml"
 
-home_config = home / ".config" / "pylut.yml"
+home_config = home / ".config" / "pylum.yml"
 module_path = pathlib.Path(__file__).parent.absolute()
 repo_path = module_path.parent
 

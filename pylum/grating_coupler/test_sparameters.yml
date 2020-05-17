@@ -1,21 +1,90 @@
-GC_S_extraction.lsf: "# S Parameter extraction for the grating coupler\n# Port 1 =\
-  \ fibre\n# Port 2 = waveguide\n\nnewproject;\nredrawoff;\n\nGC_init;\nGC_setup_fibre;\
-  \ \n\n#from waveguide to fibre\nselect(\"waveguide_source\");  set(\"enabled\",1);\n\
-  select(\"fibre::fibre_mode\"); set(\"enabled\",0);\nrun;\n\nT = getresult(\"waveguide\"\
-  ,\"expansion for T\");\nfibre = getresult(\"fibre::fibre_modeExpansion\",\"expansion\
-  \ for fibre_top\");\nf = T.f;\nS22 = T.b / T.a;\nS12 = fibre.a*sqrt(fibre.N) / (T.a*sqrt(T.N));\n\
-  \n#from fibre to waveguide\nswitchtolayout;\nselect(\"waveguide_source\");  set(\"\
-  enabled\",0);\nselect(\"fibre::fibre_mode\"); set(\"enabled\",1);\nrun;\n\nT = getresult(\"\
-  waveguide\",\"expansion for T\");\nfibre = getresult(\"fibre::fibre_modeExpansion\"\
-  ,\"expansion for fibre_top\");\nS11 = fibre.a / fibre.b;\nS21 =  T.b*sqrt(T.N) /\
-  \ (fibre.b*sqrt(fibre.N));\n\nplot(c/f*1e6,10*log10(abs([S12, S21,S11,S22])),'Wavelength\
-  \ (micron)','Transmission/Reflection (dB)');\nlegend('S12','S21','S11','S22');\n\
-  plot(c/f*1e6,unwrap(angle([S12, S21,S11,S22])),'Wavelength (micron)','Phase (rad)');\n\
-  legend('S12','S21','S11','S22');\n\n# export S parameters for INTERCONNECT\nSdata\
-  \ = [ f, abs(S11), unwrap(angle(S11)), abs(S21), unwrap(angle(S21)), abs(S12), unwrap(angle(S12)),\
-  \ abs(S22), unwrap(angle(S22)) ];\n\nfilename = \"GC_Sparam.dat\";\nrm(filename);\n\
-  format long;\nwrite(filename,num2str(Sdata));\nformat short;\n\nmatlabsave (\"GC_Sparam\"\
-  );\n"
+GC_S_extraction.lsf: '# S Parameter extraction for the grating coupler
+
+  # Port 1 = fibre
+
+  # Port 2 = waveguide
+
+
+  newproject;
+
+  redrawoff;
+
+
+  GC_init;
+
+  GC_setup_fibre;
+
+
+  #from waveguide to fibre
+
+  select("waveguide_source");  set("enabled",1);
+
+  select("fibre::fibre_mode"); set("enabled",0);
+
+  run;
+
+
+  T = getresult("waveguide","expansion for T");
+
+  fibre = getresult("fibre::fibre_modeExpansion","expansion for fibre_top");
+
+  f = T.f;
+
+  S22 = T.b / T.a;
+
+  S12 = fibre.a*sqrt(fibre.N) / (T.a*sqrt(T.N));
+
+
+  #from fibre to waveguide
+
+  switchtolayout;
+
+  select("waveguide_source");  set("enabled",0);
+
+  select("fibre::fibre_mode"); set("enabled",1);
+
+  run;
+
+
+  T = getresult("waveguide","expansion for T");
+
+  fibre = getresult("fibre::fibre_modeExpansion","expansion for fibre_top");
+
+  S11 = fibre.a / fibre.b;
+
+  S21 =  T.b*sqrt(T.N) / (fibre.b*sqrt(fibre.N));
+
+
+  plot(c/f*1e6,10*log10(abs([S12, S21,S11,S22])),''Wavelength (micron)'',''Transmission/Reflection
+  (dB)'');
+
+  legend(''S12'',''S21'',''S11'',''S22'');
+
+  plot(c/f*1e6,unwrap(angle([S12, S21,S11,S22])),''Wavelength (micron)'',''Phase (rad)'');
+
+  legend(''S12'',''S21'',''S11'',''S22'');
+
+
+  # export S parameters for INTERCONNECT
+
+  Sdata = [ f, abs(S11), unwrap(angle(S11)), abs(S21), unwrap(angle(S21)), abs(S12),
+  unwrap(angle(S12)), abs(S22), unwrap(angle(S22)) ];
+
+
+  filename = "GC_Sparam.dat";
+
+  rm(filename);
+
+  format long;
+
+  write(filename,num2str(Sdata));
+
+  format short;
+
+
+  matlabsave ("GC_Sparam");
+
+  '
 GC_draw.lsf: "# 2D Grating Coupler Model\n\n# Draw GC\nredrawoff;\ngap=period*(1-ff);\
   \ # etched region of the grating\n\n# add GC base\naddrect;\nset('name','GC_base');\n\
   set('material',material);\nset('x max',(gc_number+1)*period);\nset('x min',0);\n\
@@ -116,7 +185,7 @@ GC_setup_fibre.lsf: "# 2D Grating Coupler Model with Fibre\n\nGC_draw;  # Draw G
   set('y',0.5*thick_Si);\nset('y span',2e-6);\nset('direction','Forward');\nset('use\
   \ global source settings',true);\nset('enabled',false);\n\n\n#add fibre;\ntheta=asin(sin(theta0*pi/180)/core_index)*180/pi;\n\
   r1 = core_diameter/2;\nr2 = cladding_diameter/2;\nif(theta >  89) { theta = 89;\
-  \ }\nif(theta < -89) { theta = -89; } \n\nthetarad = theta*pi/180;\nL = 20e-6/cos(thetarad);\n\
+  \ }\nif(theta < -89) { theta = -89; }\n\nthetarad = theta*pi/180;\nL = 20e-6/cos(thetarad);\n\
   \nV1 = [ -r1/cos(thetarad),  0;\n        r1/cos(thetarad),  0;\n        r1/cos(thetarad)+L*sin(thetarad),\
   \ L*cos(thetarad);\n        -r1/cos(thetarad)+L*sin(thetarad), L*cos(thetarad)\n\
   \     ];\n\nV2 = [ -r2/cos(thetarad),  0;\n        r2/cos(thetarad),  0;\n     \
@@ -133,7 +202,7 @@ GC_setup_fibre.lsf: "# 2D Grating Coupler Model with Fibre\n\nGC_draw;  # Draw G
   set('monitor type','2D Y-normal');\nsetexpansion('fibre_top','fibre_top');\nset('x\
   \ span',span);\nset('x',d*sin(thetarad));\nset('y',d*cos(thetarad));\nset('theta',-theta);\n\
   set('rotation offset',abs(span/2*tan(thetarad)));\nset('override global monitor\
-  \ settings',false);\n\nselectpartial('fibre');\naddtogroup('fibre');\nselectpartial('::fibre_modeExpansion');\n\
+  \ settings',false);\n\nselectpartial('fibre');\naddtogroup('fibre');\nselect('fibre::fibre_modeExpansion');\n\
   setexpansion('fibre_top','::model::fibre::fibre_top');\n\nunselectall;\nselect('fibre');\n\
   set('x',Position);\nset('y',thick_Clad+1e-6);\n\n# add monitor;\naddpower;\nset('name','T');\n\
   set('monitor type','2D X-normal');\nset('x',-2.8e-6);\nset('y',0.5*thick_Si);\n\
@@ -147,8 +216,8 @@ GC_setup_fibre.lsf: "# 2D Grating Coupler Model with Fibre\n\nGC_draw;  # Draw G
   \ TE');\n    select('fibre::fibre_modeExpansion'); set('mode selection','fundamental\
   \ TE');\n    select('waveguide_source'); set('mode selection','fundamental TE');\n\
   \    select('waveguide'); set('mode selection','fundamental TE');\n}\n# global properties\n\
-  setglobalmonitor('frequency points',frequency_points);\nsetglobalmonitor('use linear\
-  \ wavelength spacing',1);\nsetglobalmonitor('use source limits',1);\nsetglobalsource('center\
+  setglobalmonitor('frequency points',frequency_points);\nsetglobalmonitor('use wavelength\
+  \ spacing',1);\nsetglobalmonitor('use source limits',1);\nsetglobalsource('center\
   \ wavelength',lambda);\nsetglobalsource('wavelength span',wl_span);\n\nsave('GC_fibre');\n"
 main.lsf: 'GC_init;
 

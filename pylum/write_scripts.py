@@ -1,6 +1,6 @@
 import pathlib
 
-from pylut.config import CONFIG
+from pylum.config import CONFIG
 
 
 def mkdir(scripts_dict):

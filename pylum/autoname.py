@@ -104,13 +104,13 @@ def join_first_letters(name):
 
 
 def autoname(function):
-    """ decorator for auto-naming pylut functions
+    """ decorator for auto-naming pylum functions
     if no Keyword argument `name`  is passed it creates a name by concenating all Keyword arguments
 
     .. plot::
       :include-source:
 
-      import pylut
+      import pylum
 
       @pp.autoname
       def grating_coupler(wg_width=0.5):
