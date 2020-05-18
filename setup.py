@@ -24,7 +24,6 @@ setup(
     url="https://github.com/joamatab/SiliconPhotonicsDesign",
     license="MIT",
     author="Joaquin",
-    author_email="j",
     description="python lumerical templates",
     long_description=read("README.md"),
     packages=find_packages(exclude=("tests",)),
