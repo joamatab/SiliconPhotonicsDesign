@@ -15,6 +15,7 @@ settings = dict(
     clad_height=2e-6,
     substrate_height=2e-6,
     material="Si (Silicon) - Palik",
+    material_clad="SiO2 (Glass) - Palik",
     wg_width=500e-9,
     polarization="TE",
     wavelength=1550e-9,
@@ -42,7 +43,7 @@ draw_source_script_names = ["GC_setup_Gaussian", "GC_setup_fibre"]
 
 @autoname
 def sweep(**kwargs):
-    """ returns a dictionary with scripts for a grating coupler sweep
+    """returns a dictionary with scripts for a grating coupler sweep
 
     Args:
         period: 0.66e-6
@@ -71,9 +72,10 @@ def sweep(**kwargs):
             kwargs.get("sweep_variable") in sweep_variables
         ), f"sweep_variable {kwargs.get('sweep_variable')} not in {sweep_variables}"
     if "draw_source_script_name" in kwargs:
-        assert (
-            kwargs.get("draw_source_script_name") in draw_source_script_names
-        ), f"draw_source_script_name {kwargs.get('draw_source_script_name')} not in {draw_source_script_names}"
+        assert kwargs.get("draw_source_script_name") in draw_source_script_names, (
+            f"draw_source_script_name {kwargs.get('draw_source_script_name')} not in"
+            f" {draw_source_script_names}"
+        )
 
     s = settings.copy()
     s.update(**kwargs)
@@ -100,7 +102,7 @@ def sweep(**kwargs):
 
 @autoname
 def sparameters(**kwargs):
-    """ returns a dictionary with scripts for calculating the Sparameters of a grating coupler
+    """returns a dictionary with scripts for calculating the Sparameters of a grating coupler
 
     Args:
         period: 0.66e-6

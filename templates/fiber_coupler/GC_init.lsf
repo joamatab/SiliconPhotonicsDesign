@@ -9,7 +9,8 @@ etch_depth = {{ etch_depth }};
 thick_BOX = {{ box_height }};
 thick_Clad = {{ clad_height }};
 Si_substrate = {{ substrate_height }};
-material = "{{ material }}";
+material = '{{ material }}';
+material_clad = '{{ material_clad }}';
 width_wg = {{ wg_width }};
 
 # define input optical source parameters
