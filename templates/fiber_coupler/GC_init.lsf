@@ -9,7 +9,6 @@ etch_depth = {{ etch_depth }};
 thick_BOX = {{ box_height }};
 thick_Clad = {{ clad_height }};
 Si_substrate = {{ substrate_height }};
-materials;
 material = "{{ material }}";
 width_wg = {{ wg_width }};
 

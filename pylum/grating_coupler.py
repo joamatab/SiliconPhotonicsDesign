@@ -14,7 +14,7 @@ settings = dict(
     box_height=2e-6,
     clad_height=2e-6,
     substrate_height=2e-6,
-    material="Si (Silicon) - Dispersive & Lossless",
+    material="Si (Silicon) - Palik",
     wg_width=500e-9,
     polarization="TE",
     wavelength=1550e-9,
@@ -53,7 +53,7 @@ def sweep(**kwargs):
         box_height: 2e-6
         clad_height: 2e-6
         substrate_height: 2e-6
-        material: Si (Silicon) - Dispersive & Lossless"
+        material: "Si (Silicon) - Palik"
         wg_width: 500e-9
         polarization: TE"
         wavelength: 1550e-9
@@ -84,7 +84,6 @@ def sweep(**kwargs):
     template = jinja2.Template(open(CONFIG["grating_coupler"] / "GC_sweeps.lsf").read())
     GC_sweeps = template.render(**s)
 
-    materials = open(CONFIG["materials"]).read()
     GC_draw = open(CONFIG["grating_coupler"] / "GC_draw.lsf").read()
     GC_setup_Gaussian = open(CONFIG["grating_coupler"] / "GC_setup_Gaussian.lsf").read()
     main = "\n".join(["GC_init;", "GC_sweeps;"])
@@ -92,7 +91,6 @@ def sweep(**kwargs):
     return {
         "GC_init.lsf": init,
         "GC_sweeps.lsf": GC_sweeps,
-        "materials.lsf": materials,
         "GC_draw.lsf": GC_draw,
         "GC_setup_Gaussian.lsf": GC_setup_Gaussian,
         "main.lsf": main,
@@ -113,17 +111,13 @@ def sparameters(**kwargs):
         box_height: 2e-6
         clad_height: 2e-6
         substrate_height: 2e-6
-        material: Si (Silicon) - Dispersive & Lossless"
+        material: "Si (Silicon) - Palik"
         wg_width: 500e-9
         polarization: TE"
         wavelength: 1550e-9
         gc_position: 4.5e-6
         fiber_angle_deg: 20
         draw_source_script_name: GC_setup_Gaussian"
-        sweep_variable: period"
-        sweep_start: 0.62e-6
-        sweep_stop: 0.7e-6
-        sweep_points: 5
     """
     d = sweep(**kwargs)
     d.pop("GC_sweeps.lsf")
@@ -180,7 +174,9 @@ def test_sparameters(data_regression):
 
 def sparameters_te():
     """ for gdsfactory default TE grating """
-    return sparameters(fiber_angle_deg=15, period=682e-9, ff=343 / 682)
+    return sparameters(
+        fiber_angle_deg=15, period=682e-9, ff=343 / 682, wg_height=220e-9
+    )
 
 
 if __name__ == "__main__":
