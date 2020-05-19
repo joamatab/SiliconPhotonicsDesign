@@ -38,7 +38,7 @@ def dict2name(prefix=None, **kwargs):
 
 
 def clean_name(name):
-    """ Ensures that names are composed of [a-zA-Z0-9]
+    """Ensures that names are composed of [a-zA-Z0-9]
 
     FIXME: only a few characters are currently replaced.
         This function has been updated only on case-by-case basis
@@ -59,7 +59,7 @@ def clean_name(name):
 
 
 def clean_value(value):
-    """ returns more readable value (integer)
+    """returns more readable value (integer)
     if number is < 1:
         returns number units in nm (integer)
     """
@@ -104,7 +104,7 @@ def join_first_letters(name):
 
 
 def autoname(function):
-    """ decorator for auto-naming pylum functions
+    """decorator for auto-naming pylum functions
     if no Keyword argument `name`  is passed it creates a name by concenating all Keyword arguments
 
     .. plot::
@@ -131,6 +131,7 @@ def autoname(function):
         simdict = function(**kwargs)
         simdict["name"] = name
         simdict["name_function"] = function.__name__
+        simdict["settings"] = kwargs.copy()
         return simdict
 
     return wrapper
