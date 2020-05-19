@@ -285,7 +285,7 @@ materials.lsf: '# materials.lsf - creates a dispersive material model in Lumeric
 
   '
 name: sparameters
-name_function: sparameters
+function_name: sparameters
 settings.json: '{"period": 6.6e-07, "ff": 0.5, "n_gratings": 50, "wg_height": 2.2e-07,
   "etch_depth": 7e-08, "box_height": 2e-06, "clad_height": 2e-06, "substrate_height":
   2e-06, "material": "Si (Silicon) - Dispersive & Lossless", "wg_width": 5e-07, "polarization":

@@ -48,7 +48,7 @@ def sparameters(
     s = session
     simdict = draw_gc(session=s, **kwargs)
 
-    dirpath = pathlib.Path(dirpath) / simdict["name_function"]
+    dirpath = pathlib.Path(dirpath) / simdict["function_name"]
     dirpath.mkdir(exist_ok=True)
     filepath = dirpath / simdict["name"]
     filepath_sim_settings = filepath.with_suffix(".settings.json")

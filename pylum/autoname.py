@@ -133,7 +133,7 @@ def autoname(function):
 
         simdict = function(**kwargs)
         simdict["name"] = name
-        simdict["name_function"] = function.__name__
+        simdict["function_name"] = function.__name__
         settings = kwargs.copy()
 
         sig = signature(function)
