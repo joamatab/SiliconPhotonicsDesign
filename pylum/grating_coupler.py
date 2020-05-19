@@ -167,11 +167,15 @@ def _demo_sweep():
 
 
 def test_sweep(data_regression):
-    data_regression.check(sweep())
+    simdict = sweep()
+    simdict.pop("settings")
+    data_regression.check(simdict)
 
 
 def test_sparameters(data_regression):
-    data_regression.check(sparameters())
+    simdict = sparameters()
+    simdict.pop("settings")
+    data_regression.check(simdict)
 
 
 def sparameters_te():

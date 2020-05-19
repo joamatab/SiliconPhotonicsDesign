@@ -3,12 +3,12 @@
 import json
 import pathlib
 
-from autoname import autoname
-from config import CONFIG
+from pylum.autoname import autoname
+from pylum.config import CONFIG
 
 
 @autoname
-def draw_gc(
+def gc(
     session=None,
     period=0.66e-6,
     ff=0.5,
@@ -42,11 +42,11 @@ def draw_gc(
 
 
 def sparameters(
-    session=None, draw_function=draw_gc, dirpath=CONFIG["workspace"], **kwargs,
+    session=None, draw_function=gc, dirpath=CONFIG["workspace"], **kwargs,
 ):
 
     s = session
-    simdict = draw_gc(session=s, **kwargs)
+    simdict = draw_function(session=s, **kwargs)
 
     dirpath = pathlib.Path(dirpath) / simdict["function_name"]
     dirpath.mkdir(exist_ok=True)

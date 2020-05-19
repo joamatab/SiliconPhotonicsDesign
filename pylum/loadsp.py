@@ -2,8 +2,9 @@ import pathlib
 import re
 
 import numpy as np
-from autoname import get_function_name
-from config import CONFIG
+
+from pylum.autoname import get_function_name
+from pylum.config import CONFIG
 
 
 def loadsp(function_name="draw_gc", dirpath=CONFIG["workspace"], numports=2, **kwargs):
