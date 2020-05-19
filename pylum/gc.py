@@ -66,8 +66,8 @@ def gc2d(
         s.addrect()
         s.set("name", "GC_tooth")
         s.set("material", material)
-        s.set("y", 0.5 * wg_height)
-        s.set("y span", wg_height)
+        s.set("y min", 0)
+        s.set("y max", wg_height)
         s.set("x min", gc_xmin + gap + i * period)
         s.set("x max", gc_xmin + period + i * period)
     s.selectpartial("GC")
@@ -101,8 +101,8 @@ def gc2d(
     s.set("material", material)
     s.set("x min", -20e-6)
     s.set("x max", gc_xmin)
-    s.set("y", 0.11e-6)
-    s.set("y span", wg_height)
+    s.set("y min", 0)
+    s.set("y max", wg_height)
 
     return dict(session=s)
 
