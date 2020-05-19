@@ -6,16 +6,19 @@ import numpy as np
 
 MAX_NAME_LENGTH = 255
 
+ignore_keys = ["session"]
+
 
 def get_function_name(function_name, **kwargs):
     name = function_name
 
     suffix = []
     for key in sorted(kwargs):
-        value = kwargs[key]
-        key = join_first_letters(key)
-        value = clean_value(value)
-        suffix += [f"{key.upper()}{value}"]
+        if key not in ignore_keys:
+            value = kwargs[key]
+            key = join_first_letters(key)
+            value = clean_value(value)
+            suffix += [f"{key.upper()}{value}"]
     suffix = "_".join(suffix)
 
     if kwargs:
@@ -75,9 +78,9 @@ def clean_value(value):
             value = f"{int(value/1e3)}K"
         elif 1 > value > 1e-3:
             value = f"{int(value*1e3)}m"
-        elif 1e-6 < value < 1e-3:
+        elif 2e-6 <= value < 1e-3:
             value = f"{int(value*1e6)}u"
-        elif 1e-9 < value < 1e-6:
+        elif 1e-9 < value < 2e-6:
             value = f"{int(value*1e9)}n"
         elif 1e-12 < value < 1e-9:
             value = f"{int(value*1e12)}p"
@@ -131,7 +134,11 @@ def autoname(function):
         simdict = function(**kwargs)
         simdict["name"] = name
         simdict["name_function"] = function.__name__
-        simdict["settings"] = kwargs.copy()
+        settings = kwargs.copy()
+
+        sig = signature(function)
+        settings.update(**{p.name: p.default for p in sig.parameters.values()})
+        simdict["settings"] = settings
         return simdict
 
     return wrapper
@@ -153,7 +160,9 @@ def test_autoname():
 
 
 def test_clean_value():
-    print(clean_value(2.222222))
+    print(clean_value(1.55))
+    print(clean_value(2e-6))
+    # print(clean_value(2.222222))
     # print(clean_value(0.5))
     # print(clean_value(2e-6))
     # print(clean_value(2e-9))
@@ -174,5 +183,5 @@ def test_clean_name():
 if __name__ == "__main__":
     # print(clean_name("mode_solver(:_=_2852"))
     # print(clean_value(0.5))
-    test_autoname()
-    # test_clean_value()
+    # test_autoname()
+    test_clean_value()
