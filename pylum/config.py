@@ -40,6 +40,7 @@ CONFIG["repo_workspace"] = repo_path / "workspace"
 CONFIG["workspace"] = pathlib.Path(CONFIG.get("workspace", repo_path / "workspace"))
 
 CONFIG["grating_coupler"] = repo_path / "templates" / "fiber_coupler"
+CONFIG["grating_coupler_2D"] = CONFIG["grating_coupler"] / "grating_coupler_2D.fsp"
 CONFIG["materials"] = repo_path / "templates" / "waveguide" / "materials.lsf"
 
 CONFIG["workspace"].mkdir(exist_ok=True)

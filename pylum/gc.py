@@ -39,7 +39,7 @@ def gc(
     s.selectall()
     s.deleteall()
 
-    s.load("grating_coupler/grating_coupler_2D.fsp")
+    s.load(str(CONFIG["grating_coupler_2D"]))
     s.select("GC")
     s.delete()
     s.select("WG")
