@@ -5,11 +5,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from pylum.autoname import autoname
+from pylum.autoname import get_function_name
 from pylum.config import CONFIG
 
 
 @autoname
-def gc(
+def gc2d(
     session=None,
     period=0.66e-6,
     ff=0.5,
@@ -32,6 +33,7 @@ def gc(
     frequency_points=100,  # global frequency points
     simulation_time=1000e-15,  # maximum simulation time [s]
 ):
+    """ draw 2D grating coupler """
     import lumapi
 
     s = session or lumapi.FDTD(hide=False)
@@ -106,21 +108,55 @@ def gc(
 
 
 def sparameters(
-    session=None, draw_function=gc, dirpath=CONFIG["workspace"], **kwargs,
+    session=None,
+    draw_function=gc2d,
+    dirpath=CONFIG["workspace"],
+    overwrite=False,
+    **kwargs,
 ):
+    """ Draws and Run Sparameter sweep
+    returns early if filepath_json exists and overwrite flag is False
 
-    s = session
-    simdict = draw_function(session=s, **kwargs)
-    settings = simdict.get("settings")
+    Args:
+        period=0.66e-6,
+        ff=0.5,
+        wl=1550e-9,
+        n_gratings=50,
+        wg_height=220e-9,
+        etch_depth=70e-9,
+        box_height=2e-6,
+        clad_height=2e-6,
+        substrate_height=2e-6,
+        material="Si (Silicon) - Palik",
+        material_clad="SiO2 (Glass) - Palik",
+        wg_width=500e-9,
+        polarization="TE",
+        wavelength=1550e-9,
+        gc_xmin=-3e-6,
+        fiber_angle_deg=20,
+        wl_span=0.3e-6,  # wavelength span
+        mesh_accuracy=3,  # FDTD simulation mesh accuracy
+        frequency_points=100,  # global frequency points
+        simulation_time=1000e-15,  # maximum simulation time [s]
 
-    dirpath = pathlib.Path(dirpath) / simdict["function_name"]
+    """
+
+    function_name = draw_function.__name__
+    filename = kwargs.pop("name", get_function_name(function_name, **kwargs))
+
+    dirpath = pathlib.Path(dirpath) / function_name
     dirpath.mkdir(exist_ok=True)
-    filepath = dirpath / simdict["name"]
+    filepath = dirpath / filename
     filepath_sim_settings = filepath.with_suffix(".settings.json")
     filepath_json = filepath.with_suffix(".json")
     filepath_fsp = str(filepath.with_suffix(".fsp"))
     filepath_sp = str(filepath.with_suffix(".dat"))
 
+    if filepath_json.exists() and not overwrite:
+        return json.loads(open(filepath_json).read())
+
+    s = session
+    simdict = draw_function(session=s, **kwargs)
     s.save(filepath_fsp)
     # s.run()
     # s.save(filepath_fsp)
@@ -163,6 +199,7 @@ def sparameters(
     results.update(rm)
     with open(filepath_json, "w") as f:
         json.dump(results, f)
+    settings = simdict.get("settings")
     if settings:
         with open(filepath_sim_settings, "w") as f:
             json.dump(settings, f)

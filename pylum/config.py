@@ -37,7 +37,9 @@ CONFIG["module_path"] = module_path
 CONFIG["repo_path"] = repo_path
 CONFIG["templates"] = repo_path / "templates"
 CONFIG["repo_workspace"] = repo_path / "workspace"
-CONFIG["workspace"] = pathlib.Path(CONFIG.get("workspace", repo_path / "workspace"))
+CONFIG["workspace"] = pathlib.Path(
+    CONFIG.get("workspace", repo_path / "workspace")
+).absolute()
 
 CONFIG["grating_coupler"] = repo_path / "templates" / "fiber_coupler"
 CONFIG["grating_coupler_2D"] = CONFIG["grating_coupler"] / "grating_coupler_2D.fsp"
