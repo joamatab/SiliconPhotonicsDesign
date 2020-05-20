@@ -117,22 +117,37 @@ def gc2d(
     return dict(session=s)
 
 
+def load(draw_function=gc2d, dirpath=CONFIG["workspace"], **kwargs):
+    """ returns dict with grating coupler Sparameters """
+    function_name = draw_function.__name__
+    filename = get_function_name(function_name, **kwargs)
+
+    dirpath = pathlib.Path(dirpath) / function_name
+    filepath = dirpath / filename
+    filepath_json = filepath.with_suffix(".json")
+
+    return json.loads(open(filepath_json).read())
+
+
+def test_load(data_regression):
+    simdict = load()
+    data_regression.check(simdict)
+
+
 def sparameters(
     session=None,
     draw_function=gc2d,
-    filepath=None,
     dirpath=CONFIG["workspace"],
     overwrite=False,
     **kwargs,
 ):
-    """Draws and Run Sparameter sweep
-    returns early if filepath_json exists and overwrite flag is False
+    """Write grating coupler Sparameters
+    returns early if filepath_sp exists and overwrite flag is False
 
     Args:
         session
         draw_function:
         dirpath: where to store all the simulation files
-        filepath: where to store a copy of the Sparameters
         overwrite: run even if simulation exists
 
     Kwargs:
@@ -156,6 +171,9 @@ def sparameters(
         frequency_points=100,  # global frequency points
         simulation_time=1000e-15,  # maximum simulation time [s]
         base_fsp_path=str(CONFIG["grating_coupler_2D"]),
+
+    Returns:
+        results_dict
 
     """
 
@@ -182,15 +200,11 @@ def sparameters(
     s.exportsweep("S-parameters", filepath_sp)
     print(f"wrote sparameters to {filepath_sp}")
 
-    if filepath:
-        s.exportsweep("S-parameters", str(filepath))
-        print(f"wrote sparameters to {filepath}")
-
     keys = [key for key in sp.keys() if key.startswith("S")]
     ra = {f"{key}a": list(np.unwrap(np.angle(sp[key].flatten()))) for key in keys}
     rm = {f"{key}m": list(np.abs(sp[key].flatten())) for key in keys}
 
-    results = {"wavelength_nm": list(sp["lambda"].flatten() * 1e9)}
+    results = dict(wavelength_nm=list(sp["lambda"].flatten() * 1e9))
     results.update(ra)
     results.update(rm)
     with open(filepath_json, "w") as f:
@@ -226,11 +240,14 @@ def plot(results, logscale=True, keys=None):
 
 
 if __name__ == "__main__":
-    import lumapi
+    # import lumapi
 
-    s = lumapi.FDTD()
+    # s = lumapi.FDTD()
     # d = gc(session=s)
-    results = sparameters(session=s)
-    plot(results)
-
+    # results = sparameters(session=s)
+    # plot(results)
     # print(r)
+
+    r = load()
+
+    print(r.keys())

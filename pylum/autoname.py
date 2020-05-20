@@ -145,6 +145,7 @@ def autoname(function):
 
         settings.update(**{p.name: p.default for p in sig.parameters.values()})
         simdict["settings"] = settings
+        simdict["settings"].pop("session", "")
         return simdict
 
     return wrapper
