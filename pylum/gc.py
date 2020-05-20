@@ -14,7 +14,6 @@ def gc2d(
     session=None,
     period=0.66e-6,
     ff=0.5,
-    wl=1550e-9,
     n_gratings=50,
     wg_height=220e-9,
     etch_depth=70e-9,
@@ -28,7 +27,7 @@ def gc2d(
     wavelength=1550e-9,
     gc_xmin=-3e-6,
     fiber_angle_deg=20,
-    wl_span=0.3e-6,  # wavelength span
+    wavelength_span=300e-9,  # wavelength span
     mesh_accuracy=3,  # FDTD simulation mesh accuracy
     frequency_points=100,  # global frequency points
     simulation_time=1000e-15,  # maximum simulation time [s]
@@ -50,6 +49,11 @@ def gc2d(
 
     s.select("fiber")
     s.set("theta", fiber_angle_deg)
+
+    s.select("FDTD")
+    s.set("set simulation bandwidth", True)
+    s.set("simulation wavelength min", wavelength - wavelength_span / 2)
+    s.set("simulation wavelength max", wavelength + wavelength_span / 2)
 
     gap = period * (1 - ff)
     # etched region of the grating
@@ -121,7 +125,6 @@ def sparameters(
     Args:
         period=0.66e-6,
         ff=0.5,
-        wl=1550e-9,
         n_gratings=50,
         wg_height=220e-9,
         etch_depth=70e-9,
@@ -133,9 +136,9 @@ def sparameters(
         wg_width=500e-9,
         polarization="TE",
         wavelength=1550e-9,
+        wavelength_span=0.3e-6
         gc_xmin=-3e-6,
         fiber_angle_deg=20,
-        wl_span=0.3e-6,  # wavelength span
         mesh_accuracy=3,  # FDTD simulation mesh accuracy
         frequency_points=100,  # global frequency points
         simulation_time=1000e-15,  # maximum simulation time [s]
@@ -159,39 +162,13 @@ def sparameters(
     s = session
     simdict = draw_function(session=s, **kwargs)
     s.save(filepath_fsp)
-    # s.run()
-    # s.save(filepath_fsp)
+    s.runsweep("S-parameters")
 
-    # if a sweep task named s-parameter sweep already exists, remove it
-    s.deletesweep("s-parameter sweep")
-
-    # add s-parameter sweep task
-    s.addsweep(3)
-
-    # un-check "Excite all ports" option
-    s.setsweep("s-parameter sweep", "Excite all ports", 0)
-
-    # use auto-symmetry to populate the S-matrix setup table
-    s.setsweep("S sweep", "auto symmetry", True)
-
-    # run s-parameter sweep
-    s.runsweep("s-parameter sweep")
-
-    # collect results
-    # S_matrix = s.getsweepresult("s-parameter sweep", "S matrix")
-    sp = s.getsweepresult("s-parameter sweep", "S parameters")
-
-    # visualize results
-    # s.visualize(S_matrix);
-    # s.visualize(S_parameters);
-    # s.visualize(S_diagnostic);
-
-    # export S-parameter data to file named s_params.dat to be loaded in INTERCONNECT
-    s.exportsweep("s-parameter sweep", filepath_sp)
+    sp = s.getsweepresult("S-parameters", "S parameters")
+    s.exportsweep("S-parameters", filepath_sp)
     print(f"wrote sparameters to {filepath_sp}")
 
     keys = [key for key in sp.keys() if key.startswith("S")]
-
     ra = {f"{key}a": list(np.unwrap(np.angle(sp[key].flatten()))) for key in keys}
     rm = {f"{key}m": list(np.abs(sp[key].flatten())) for key in keys}
 

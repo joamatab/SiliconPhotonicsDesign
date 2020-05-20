@@ -12,7 +12,6 @@ def gc(
     session=None,
     period=0.66e-6,
     ff=0.5,
-    wl=1550e-9,
     n_gratings=50,
     wg_height=220e-9,
     etch_depth=70e-9,
@@ -26,7 +25,7 @@ def gc(
     wavelength=1550e-9,
     gc_xmin=-3e-6,
     fiber_angle_deg=20,
-    wl_span=300e-9,  # wavelength span
+    wavelength_span=300e-9,
     mesh_accuracy=3,  # FDTD simulation mesh accuracy
     frequency_points=100,  # global frequency points
     simulation_time=1000e-15,  # maximum simulation time [s]
@@ -70,5 +69,5 @@ if __name__ == "__main__":
     # d = gc(session=session)
     # r = sparameters(session=d["session"], settings=d["settings"])
 
-    r = sparameters(wl=1540e-9, wg_height=220e-9)
+    r = sparameters(wavelength=1540e-9, wg_height=220e-9)
     print(r)

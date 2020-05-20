@@ -107,7 +107,7 @@ def join_first_letters(name):
 
 
 def autoname(function):
-    """decorator for auto-naming pylum functions
+    """decorator for auto-naming functions
     if no Keyword argument `name`  is passed it creates a name by concenating all Keyword arguments
 
     .. plot::
@@ -131,12 +131,18 @@ def autoname(function):
             raise ValueError("autoname supports only Keyword args")
         name = kwargs.pop("name", get_function_name(function.__name__, **kwargs))
 
+        sig = signature(function)
+        if "args" not in sig.parameters and "kwargs" not in sig.parameters:
+            for key in kwargs.keys():
+                assert (
+                    key in sig.parameters.keys()
+                ), f"{key} key not in {list(sig.parameters.keys())}"
+
         simdict = function(**kwargs)
         simdict["name"] = name
         simdict["function_name"] = function.__name__
         settings = kwargs.copy()
 
-        sig = signature(function)
         settings.update(**{p.name: p.default for p in sig.parameters.values()})
         simdict["settings"] = settings
         return simdict
