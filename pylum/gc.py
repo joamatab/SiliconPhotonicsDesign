@@ -183,7 +183,7 @@ def sparameters(
     print(f"wrote sparameters to {filepath_sp}")
 
     if filepath:
-        s.exportsweep("S-parameters", filepath)
+        s.exportsweep("S-parameters", str(filepath))
         print(f"wrote sparameters to {filepath}")
 
     keys = [key for key in sp.keys() if key.startswith("S")]
