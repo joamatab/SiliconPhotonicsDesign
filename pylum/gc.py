@@ -50,10 +50,15 @@ def gc2d(
     s.select("fiber")
     s.set("theta", fiber_angle_deg)
 
-    s.select("FDTD")
-    s.set("set simulation bandwidth", True)
-    s.set("simulation wavelength min", wavelength - wavelength_span / 2)
-    s.set("simulation wavelength max", wavelength + wavelength_span / 2)
+    s.select("")
+    s.set("lambda0", wavelength)
+
+    s.setglobalsource("center wavelength", wavelength)
+    s.setglobalsource("wavelength span", wavelength_span)
+    # s.select("FDTD")
+    # s.set("set simulation bandwidth", True)
+    # s.set("simulation wavelength min", wavelength - wavelength_span / 2)
+    # s.set("simulation wavelength max", wavelength + wavelength_span / 2)
 
     gap = period * (1 - ff)
     # etched region of the grating
