@@ -120,6 +120,7 @@ def gc2d(
 def sparameters(
     session=None,
     draw_function=gc2d,
+    filepath=None,
     dirpath=CONFIG["workspace"],
     overwrite=False,
     **kwargs,
@@ -128,8 +129,15 @@ def sparameters(
     returns early if filepath_json exists and overwrite flag is False
 
     Args:
-        period=0.66e-6,
-        ff=0.5,
+        session
+        draw_function:
+        dirpath: where to store all the simulation files
+        filepath: where to store a copy of the Sparameters
+        overwrite: run even if simulation exists
+
+    Kwargs:
+        period: 0.66e-6 (m)
+        ff: 0.5 fill factor
         n_gratings=50,
         wg_height=220e-9,
         etch_depth=70e-9,
@@ -147,11 +155,12 @@ def sparameters(
         mesh_accuracy=3,  # FDTD simulation mesh accuracy
         frequency_points=100,  # global frequency points
         simulation_time=1000e-15,  # maximum simulation time [s]
+        base_fsp_path=str(CONFIG["grating_coupler_2D"]),
 
     """
 
     function_name = draw_function.__name__
-    filename = kwargs.pop("name", get_function_name(function_name, **kwargs))
+    filename = get_function_name(function_name, **kwargs)
 
     dirpath = pathlib.Path(dirpath) / function_name
     dirpath.mkdir(exist_ok=True)
@@ -172,6 +181,10 @@ def sparameters(
     sp = s.getsweepresult("S-parameters", "S parameters")
     s.exportsweep("S-parameters", filepath_sp)
     print(f"wrote sparameters to {filepath_sp}")
+
+    if filepath:
+        s.exportsweep("S-parameters", filepath)
+        print(f"wrote sparameters to {filepath}")
 
     keys = [key for key in sp.keys() if key.startswith("S")]
     ra = {f"{key}a": list(np.unwrap(np.angle(sp[key].flatten()))) for key in keys}
