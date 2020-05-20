@@ -32,6 +32,7 @@ def gc2d(
     mesh_accuracy=3,  # FDTD simulation mesh accuracy
     frequency_points=100,  # global frequency points
     simulation_time=1000e-15,  # maximum simulation time [s]
+    base_fsp_path=str(CONFIG["grating_coupler_2D"]),
 ):
     """ draw 2D grating coupler """
     import lumapi
@@ -41,7 +42,7 @@ def gc2d(
     s.selectall()
     s.deleteall()
 
-    s.load(str(CONFIG["grating_coupler_2D"]))
+    s.load(base_fsp_path)
     s.select("GC")
     s.delete()
     s.select("WG")
@@ -114,7 +115,7 @@ def sparameters(
     overwrite=False,
     **kwargs,
 ):
-    """ Draws and Run Sparameter sweep
+    """Draws and Run Sparameter sweep
     returns early if filepath_json exists and overwrite flag is False
 
     Args:

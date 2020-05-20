@@ -6,7 +6,7 @@ import numpy as np
 
 MAX_NAME_LENGTH = 255
 
-ignore_keys = ["session"]
+ignore_keys = ["session", "base_fsp_path"]
 
 
 def get_function_name(function_name, **kwargs):
