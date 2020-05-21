@@ -117,7 +117,9 @@ def gc2d(
     return dict(session=s)
 
 
-def load(draw_function=gc2d, dirpath=CONFIG["workspace"], **kwargs):
+def load_sparameters_from_kwargs(
+    draw_function=gc2d, dirpath=CONFIG["workspace"], **kwargs
+):
     """ returns dict with grating coupler Sparameters """
     function_name = draw_function.__name__
     filename = get_function_name(function_name, **kwargs)
@@ -130,8 +132,13 @@ def load(draw_function=gc2d, dirpath=CONFIG["workspace"], **kwargs):
 
 
 def test_load(data_regression):
-    simdict = load()
+    simdict = load_sparameters_from_kwargs()
     data_regression.check(simdict)
+
+
+def load_sparameters(filepath_json):
+    """ returns dict with grating coupler Sparameters """
+    return json.loads(open(filepath_json).read())
 
 
 def sparameters(
@@ -173,7 +180,7 @@ def sparameters(
         base_fsp_path=str(CONFIG["grating_coupler_2D"]),
 
     Returns:
-        results_dict
+        Sparameters filepath in interconnect format
 
     """
 
@@ -188,8 +195,8 @@ def sparameters(
     filepath_fsp = str(filepath.with_suffix(".fsp"))
     filepath_sp = str(filepath.with_suffix(".dat"))
 
-    if filepath_json.exists() and not overwrite:
-        return json.loads(open(filepath_json).read())
+    if filepath_sp.exists() and not overwrite:
+        return filepath_sp
 
     s = session
     simdict = draw_function(session=s, **kwargs)
@@ -213,7 +220,7 @@ def sparameters(
     if settings:
         with open(filepath_sim_settings, "w") as f:
             json.dump(settings, f)
-    return results
+    return filepath_sp
 
 
 def plot(results, logscale=True, keys=None):
@@ -248,6 +255,6 @@ if __name__ == "__main__":
     # plot(results)
     # print(r)
 
-    r = load()
+    r = load_sparameters_from_kwargs()
 
     print(r.keys())
