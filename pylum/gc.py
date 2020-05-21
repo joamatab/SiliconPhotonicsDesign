@@ -192,19 +192,19 @@ def sparameters(
     filepath = dirpath / filename
     filepath_sim_settings = filepath.with_suffix(".settings.json")
     filepath_json = filepath.with_suffix(".json")
-    filepath_fsp = str(filepath.with_suffix(".fsp"))
-    filepath_sp = str(filepath.with_suffix(".dat"))
+    filepath_fsp = filepath.with_suffix(".fsp")
+    filepath_sp = filepath.with_suffix(".dat")
 
     if filepath_sp.exists() and not overwrite:
         return filepath_sp
 
     s = session
     simdict = draw_function(session=s, **kwargs)
-    s.save(filepath_fsp)
+    s.save(str(filepath_fsp))
     s.runsweep("S-parameters")
 
     sp = s.getsweepresult("S-parameters", "S parameters")
-    s.exportsweep("S-parameters", filepath_sp)
+    s.exportsweep("S-parameters", str(filepath_sp))
     print(f"wrote sparameters to {filepath_sp}")
 
     keys = [key for key in sp.keys() if key.startswith("S")]
