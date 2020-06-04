@@ -25,7 +25,7 @@ setup(
     license="MIT",
     author="Joaquin",
     description="python lumerical templates",
-    long_description=read("README.md"),
+    long_description="python lumerical templates",
     packages=find_packages(exclude=("tests",)),
     install_requires=get_install_requires(),
     python_requires=">=3.6",

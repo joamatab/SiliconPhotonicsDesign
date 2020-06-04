@@ -1,4 +1,4 @@
-# PyLuT: Python Lumerical templates 0.0.1
+# PyLum: Python Lumerical Templates 0.0.1
 
 Create lumerical scripts from python.
 
