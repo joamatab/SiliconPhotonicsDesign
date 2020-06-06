@@ -14,6 +14,7 @@ def gc_sweep(
     base_fsp_path=str(CONFIG["grating_coupler_2D_base"]),
     **kwargs
 ):
+    """ new grating coupler sweep """
 
     function_name = draw_function.__name__ + "_sweep"
     filename = kwargs.pop("name", get_function_name(function_name, **kwargs))

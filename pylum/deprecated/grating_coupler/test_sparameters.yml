@@ -91,15 +91,15 @@ GC_draw.lsf: "# 2D Grating Coupler Model\n\n# Draw GC\nredrawoff;\ngap=period*(1
   set('y',0.5*(thick_Si-etch_depth));\nset('y span',thick_Si-etch_depth);\n\n# add\
   \ GC teeth;\nfor(i=0:gc_number)\n{\n  addrect;\n  set('name','GC_tooth');\n  set('material',material);\n\
   \  set('y',0.5*thick_Si);\n  set('y span',thick_Si);\n  set('x min',gap+i*period);\n\
-  \  set('x max',period+i*period);\n}\nselectpartial('GC');\naddtogroup('GC');\n\n\
-  \n# draw silicon substrate;\naddrect;\nset('name','Si_sub');\nset('material', material);\n\
-  set('x max',30e-6);\nset('x min', -20e-6);\nset('y',-1*(thick_BOX+0.5*Si_substrate));\n\
+  \  set('x max',gap+i*period+ff*period);\n}\nselectpartial('GC');\naddtogroup('GC');\n\
+  \n\n# draw silicon substrate;\naddrect;\nset('name','Si_sub');\nset('material',\
+  \ material);\nset('x max',30e-6);\nset('x min', -20e-6);\nset('y',-1*(thick_BOX+0.5*Si_substrate));\n\
   set('y span',Si_substrate);\nset('alpha',0.2);\n\n#draw burried oxide;\naddrect;\n\
   set('name','BOX');\nset('material', material_clad);\nset('x max',30e-6);\nset('x\
   \ min',-20e-6);\nset('y min',-thick_BOX);\nset('y max',thick_Clad);\nset('override\
   \ mesh order from material database',true);\nset('mesh order',3);\nset('alpha',0.3);\n\
   \n#draw waveguide;\naddrect;\nset('name','WG');\nset('material', material);\nset('x\
-  \ min',-20e-6);\nset('x max', 0);\nset('y',0.11e-6);\nset('y span',0.22e-6);\n"
+  \ min',-20e-6);\nset('x max', 0);\nset('y min',0);\nset('y max', thick_Si);\n"
 GC_init.lsf: '# define grating coupler parameters
 
   period = 6.6e-07;
@@ -215,8 +215,8 @@ GC_setup_fibre.lsf: "# 2D Grating Coupler Model with Fibre\n\nGC_draw;  # Draw G
   \ TE');\n    select('fibre::fibre_modeExpansion'); set('mode selection','fundamental\
   \ TE');\n    select('waveguide_source'); set('mode selection','fundamental TE');\n\
   \    select('waveguide'); set('mode selection','fundamental TE');\n}\n# global properties\n\
-  setglobalmonitor('frequency points',frequency_points);\nsetglobalmonitor('use wavelength\
-  \ spacing',1);\nsetglobalmonitor('use source limits',1);\nsetglobalsource('center\
+  setglobalmonitor('frequency points',frequency_points);\n# setglobalmonitor('use\
+  \ wavelength spacing',1);\nsetglobalmonitor('use source limits',1);\nsetglobalsource('center\
   \ wavelength',lambda);\nsetglobalsource('wavelength span',wl_span);\n\nsave('GC_fibre');\n"
 function_name: sparameters
 main.lsf: 'GC_init;

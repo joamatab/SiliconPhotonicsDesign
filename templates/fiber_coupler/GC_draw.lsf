@@ -22,7 +22,7 @@ for(i=0:gc_number)
   set('y',0.5*thick_Si);
   set('y span',thick_Si);
   set('x min',gap+i*period);
-  set('x max',period+i*period);
+  set('x max',gap+i*period+ff*period);
 }
 selectpartial('GC');
 addtogroup('GC');

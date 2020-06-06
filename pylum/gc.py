@@ -1,3 +1,5 @@
+""" grating coupler
+"""
 import json
 import pathlib
 
@@ -35,6 +37,8 @@ def gc2d(
 ):
     """ draw 2D grating coupler """
     import lumapi
+
+    assert ff < 1, f"fill factor {ff:.3f} is the ratio of period/maxHeigh"
 
     s = session or lumapi.FDTD(hide=False)
     s.newproject()
@@ -141,7 +145,7 @@ def load_sparameters(filepath_json):
     return json.loads(open(filepath_json).read())
 
 
-def sparameters(
+def write_sparameters(
     session=None,
     draw_function=gc2d,
     dirpath=CONFIG["workspace"],
@@ -183,6 +187,7 @@ def sparameters(
         Sparameters filepath in interconnect format
 
     """
+    import lumapi
 
     function_name = draw_function.__name__
     filename = get_function_name(function_name, **kwargs)
@@ -198,7 +203,7 @@ def sparameters(
     if filepath_sp.exists() and not overwrite:
         return filepath_sp
 
-    s = session
+    s = session or lumapi.FDTD()
     simdict = draw_function(session=s, **kwargs)
     s.save(str(filepath_fsp))
     s.runsweep("S-parameters")
