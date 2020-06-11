@@ -1,4 +1,11 @@
-""" grating coupler
+""" grating coupler 2D Lumerical FDTD simulation
+
+You can specify any grating coupler geomery and simulation parameters for a 2D FDTD Lumerical simulation.
+
+There is 2 ways to define a grating coupler:
+
+- Define period, fill_factor and n_gratings
+- Define a list of (gap, width) for the grating teeth
 """
 import json
 import pathlib
@@ -16,6 +23,7 @@ def gc2d(
     session=None,
     period=0.66e-6,
     ff=0.5,
+    gap_width_list=None,
     n_gratings=50,
     wg_height=220e-9,
     etch_depth=70e-9,
@@ -24,18 +32,17 @@ def gc2d(
     substrate_height=2e-6,
     material="Si (Silicon) - Palik",
     material_clad="SiO2 (Glass) - Palik",
-    wg_width=500e-9,
-    polarization="TE",
-    wavelength=1550e-9,
     gc_xmin=-3e-6,
     fiber_angle_deg=20,
+    wavelength=1550e-9,
     wavelength_span=300e-9,  # wavelength span
-    mesh_accuracy=3,  # FDTD simulation mesh accuracy
-    frequency_points=100,  # global frequency points
-    simulation_time=1000e-15,  # maximum simulation time [s]
     base_fsp_path=str(CONFIG["grating_coupler_2D"]),
 ):
-    """ draw 2D grating coupler """
+    """ draw 2D grating coupler
+
+    gap_width_list overrides (period, ff and n_gratings)
+
+    """
     import lumapi
 
     assert ff < 1, f"fill factor {ff:.3f} is the ratio of period/maxHeigh"
@@ -46,10 +53,6 @@ def gc2d(
     s.deleteall()
 
     s.load(base_fsp_path)
-    s.select("GC")
-    s.delete()
-    s.select("WG")
-    s.delete()
 
     s.select("fiber")
     s.set("theta", fiber_angle_deg)
@@ -76,14 +79,18 @@ def gc2d(
     s.set("y span", wg_height - etch_depth)
 
     # add GC teeth;
-    for i in range(n_gratings):
+    gap_width_list = gap_width_list or [(gap, ff * period)] * n_gratings
+    xmin = gc_xmin
+
+    for gap, width in gap_width_list:
         s.addrect()
         s.set("name", "GC_tooth")
         s.set("material", material)
         s.set("y min", 0)
         s.set("y max", wg_height)
-        s.set("x min", gc_xmin + gap + i * period)
-        s.set("x max", gc_xmin + period + i * period)
+        s.set("x min", xmin + gap)
+        s.set("x max", xmin + gap + width)
+        xmin += gap + width
     s.selectpartial("GC")
     s.addtogroup("GC")
 
@@ -142,6 +149,11 @@ def test_load(data_regression):
 
 def load_sparameters(filepath_json):
     """ returns dict with grating coupler Sparameters """
+    filepath_json = pathlib.Path(filepath_json)
+    if filepath_json.suffix == ".dat":
+        filepath_json = filepath_json.with_suffix(".json")
+
+    assert filepath_json.exists(), f"{filepath_json} does not exist"
     return json.loads(open(filepath_json).read())
 
 
@@ -150,10 +162,14 @@ def write_sparameters(
     draw_function=gc2d,
     dirpath=CONFIG["workspace"],
     overwrite=False,
+    run=True,
     **kwargs,
 ):
     """Write grating coupler Sparameters
     returns early if filepath_sp exists and overwrite flag is False
+
+    Returns:
+        Sparameters filepath in interconnect format
 
     Args:
         session
@@ -162,29 +178,21 @@ def write_sparameters(
         overwrite: run even if simulation exists
 
     Kwargs:
-        period: 0.66e-6 (m)
+        period (m): 0.66e-6
         ff: 0.5 fill factor
-        n_gratings=50,
-        wg_height=220e-9,
-        etch_depth=70e-9,
-        box_height=2e-6,
-        clad_height=2e-6,
-        substrate_height=2e-6,
-        material="Si (Silicon) - Palik",
-        material_clad="SiO2 (Glass) - Palik",
-        wg_width=500e-9,
-        polarization="TE",
-        wavelength=1550e-9,
-        wavelength_span=0.3e-6
-        gc_xmin=-3e-6,
-        fiber_angle_deg=20,
-        mesh_accuracy=3,  # FDTD simulation mesh accuracy
-        frequency_points=100,  # global frequency points
-        simulation_time=1000e-15,  # maximum simulation time [s]
-        base_fsp_path=str(CONFIG["grating_coupler_2D"]),
-
-    Returns:
-        Sparameters filepath in interconnect format
+        n_gratings: 50
+        gap_width_list: [(gap1, width1), (gap2, width2) ...] overrides (period, ff and n_gratings)
+        wg_height: 220e-9
+        etch_depth: 70e-9
+        box_height: 2e-6
+        clad_height: 2e-6
+        substrate_height: 2e-6
+        material: "Si (Silicon) - Palik"
+        material_clad: "SiO2 (Glass) - Palik"
+        wavelength: 1550e-9
+        wavelength_span: 0.3e-6
+        gc_xmin: 3e-6
+        fiber_angle_deg: 20
 
     """
     import lumapi
@@ -200,12 +208,16 @@ def write_sparameters(
     filepath_fsp = filepath.with_suffix(".fsp")
     filepath_sp = filepath.with_suffix(".dat")
 
-    if filepath_sp.exists() and not overwrite:
+    if filepath_sp.exists() and not overwrite and run:
         return filepath_sp
 
-    s = session or lumapi.FDTD()
+    s = session or lumapi.FDTD(hide=False)
     simdict = draw_function(session=s, **kwargs)
     s.save(str(filepath_fsp))
+
+    if not run:
+        return filepath_sp
+
     s.runsweep("S-parameters")
 
     sp = s.getsweepresult("S-parameters", "S parameters")
@@ -216,11 +228,11 @@ def write_sparameters(
     ra = {f"{key}a": list(np.unwrap(np.angle(sp[key].flatten()))) for key in keys}
     rm = {f"{key}m": list(np.abs(sp[key].flatten())) for key in keys}
 
-    results = dict(wavelength_nm=list(sp["lambda"].flatten() * 1e9))
-    results.update(ra)
-    results.update(rm)
+    sp_dict = dict(wavelength_nm=list(sp["lambda"].flatten() * 1e9))
+    sp_dict.update(ra)
+    sp_dict.update(rm)
     with open(filepath_json, "w") as f:
-        json.dump(results, f)
+        json.dump(sp_dict, f)
     settings = simdict.get("settings")
     if settings:
         with open(filepath_sim_settings, "w") as f:
@@ -228,9 +240,9 @@ def write_sparameters(
     return filepath_sp
 
 
-def plot(results, logscale=True, keys=None):
-    """plots Sparameters"""
-    r = results
+def plot(sp_dict, logscale=True, keys=None):
+    """plots Sparameters dict"""
+    r = sp_dict
     w = r["wavelength_nm"]
 
     if keys:
@@ -251,13 +263,27 @@ def plot(results, logscale=True, keys=None):
     plt.xlabel("wavelength (nm)")
 
 
+def max_transmission(sp_dict, key="S12m"):
+    return max(sp_dict[key])
+
+
+def max_transmission_dB(sp_dict, key="S12m"):
+    return 10 * np.log10(max(sp_dict[key]))
+
+
+def max_transmission_wavelength(sp_dict, key="S12m"):
+    """ returns wavelength for max transmission"""
+    S = sp_dict[key]
+    return sp_dict["wavelength_nm"][np.argmax(S)]
+
+
 if __name__ == "__main__":
     # import lumapi
 
     # s = lumapi.FDTD()
     # d = gc(session=s)
-    # results = sparameters(session=s)
-    # plot(results)
+    # sp_dict = sparameters(session=s)
+    # plot(sp_dict)
     # print(r)
 
     r = load_sparameters_from_kwargs()
