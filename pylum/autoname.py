@@ -4,6 +4,10 @@ from inspect import signature
 
 import numpy as np
 
+from pylum.cache import read_cache
+from pylum.cache import write_cache
+from pylum.config import CONFIG
+
 MAX_NAME_LENGTH = 255
 
 ignore_keys = ["session", "base_fsp_path"]
@@ -130,6 +134,7 @@ def autoname(function):
         if args:
             raise ValueError("autoname supports only Keyword args")
         name = kwargs.pop("name", get_function_name(function.__name__, **kwargs))
+        cache = kwargs.pop("cache", True)
 
         sig = signature(function)
         if "args" not in sig.parameters and "kwargs" not in sig.parameters:
@@ -138,7 +143,14 @@ def autoname(function):
                     key in sig.parameters.keys()
                 ), f"{key} key not in {list(sig.parameters.keys())}"
 
-        simdict = function(**kwargs)
+        filepath = CONFIG["workspace"] / f"{name}.h5"
+
+        if cache and filepath.exists():
+            simdict = dict(results=read_cache(filepath))
+
+        else:
+            simdict = function(**kwargs)
+            write_cache(simdict, filepath)
         simdict["name"] = name
         simdict["function_name"] = function.__name__
         settings = kwargs.copy()
@@ -152,8 +164,15 @@ def autoname(function):
 
 
 @autoname
-def _dummy(plot=True, length=3, wg_width=0.5):
+def _dummy(
+    plot=True,
+    length=3,
+    wg_width=0.5,
+    radius=[2e-3, 3e-3],
+    material_wg="Si (Silicon) - Palik",
+):
     c = dict()
+    print("im running")
     return c
 
 
@@ -191,4 +210,6 @@ if __name__ == "__main__":
     # print(clean_name("mode_solver(:_=_2852"))
     # print(clean_value(0.5))
     # test_autoname()
-    test_clean_value()
+    # test_clean_value()
+    # print(_dummy(radius = [1e-3, 5e-3])['name'])
+    print(_dummy(cache=False, material_wg="SiO2 (Glass) - Palik")["name"])

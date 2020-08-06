@@ -122,7 +122,7 @@ def sparameters(**kwargs):
         draw_source_script_name: GC_setup_Gaussian"
     """
     d = sweep(**kwargs)
-    d.pop("GC_sweeps.lsf")
+    d.pop("GC_sweeps.lsf", "")
     d["main.lsf"] = "\n".join(["GC_init;", "GC_S_extraction;"])
     d["GC_S_extraction.lsf"] = open(
         CONFIG["grating_coupler"] / "GC_S_extraction.lsf"

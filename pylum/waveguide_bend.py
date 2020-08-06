@@ -1,8 +1,5 @@
 """ draw waveguide bend. calculate bend loss
 """
-import json
-import pathlib
-
 import matplotlib.pyplot as plt
 import numpy as np
 
