@@ -171,9 +171,9 @@ def _dummy(
     radius=[2e-3, 3e-3],
     material_wg="Si (Silicon) - Palik",
 ):
-    c = dict()
+    d = dict(string="Hello!", array=np.array([1, 2, 3]))
     print("im running")
-    return c
+    return d
 
 
 def test_autoname():
@@ -212,4 +212,6 @@ if __name__ == "__main__":
     # test_autoname()
     # test_clean_value()
     # print(_dummy(radius = [1e-3, 5e-3])['name'])
-    print(_dummy(cache=False, material_wg="SiO2 (Glass) - Palik")["name"])
+    # print(_dummy(cache=False, material_wg="SiO2 (Glass) - Palik")["name"])
+    # print(_dummy(cache=False, material_wg="SiO2 (Glass) - Palik"))
+    print(_dummy(material_wg="SiO2 (Glass) - Palik")["results"].keys())

@@ -6,7 +6,7 @@ from pylum.config import CONFIG
 
 def test_cache():
     filepath = CONFIG["workspace"] / "test.h5"
-    d = dict(string="a", array=np.array([1, 2]))
+    d = dict(string="Hello!", array=np.array([1, 2, 3]))
 
     write_cache(d, filepath)
     d2 = read_cache(filepath)
