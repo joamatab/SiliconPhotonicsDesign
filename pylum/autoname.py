@@ -146,7 +146,9 @@ def autoname(function):
         filepath = CONFIG["workspace"] / f"{name}.h5"
 
         if cache and filepath.exists():
-            simdict = dict(results=read_cache(filepath))
+            # simdict = dict(results=read_cache(filepath))
+            results = read_cache(filepath)
+            simdict = {k: v[()] for k, v in results.items()}
 
         else:
             simdict = function(**kwargs)

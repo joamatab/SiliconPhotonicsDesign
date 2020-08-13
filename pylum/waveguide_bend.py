@@ -1,4 +1,7 @@
-""" draw waveguide bend. calculate bend loss
+"""
+- draw waveguide bend
+- calculate bend loss
+- plot bend loss vs radius
 """
 import matplotlib.pyplot as plt
 import numpy as np
@@ -8,7 +11,7 @@ from pylum.waveguide import waveguide
 
 
 @autoname
-def waveguide_bend(radius=np.array([2, 5]) * 1e-6, session=None, **kwargs):
+def waveguide_bend(radius=np.array([3, 5, 10]) * 1e-6, session=None, **kwargs):
     """ computes bend loss for waveguide bend radius
 
     Args:
@@ -28,6 +31,15 @@ def waveguide_bend(radius=np.array([2, 5]) * 1e-6, session=None, **kwargs):
         wavelength: 1550e-9
         mesh_size: 10e-9
         modes: 4
+
+    Returns:
+        session: lumapi.MODE session
+        neff: bend effective index iterable (includes zero)
+        radius_all: bend radius iterable (includes zero)
+        radius: bend radius (m) iterable
+        loss: mode missmatch loss per bend
+        loss_dB_m: propagation loss
+        loss_per_bend: total propagation loss
 
     """
     s = waveguide(session=session, **kwargs)
@@ -58,23 +70,51 @@ def waveguide_bend(radius=np.array([2, 5]) * 1e-6, session=None, **kwargs):
                 out = s.overlap("::radius0", f"::radius{r}").squeeze()
                 power_coupling[i] = out[1]  # power coupling
 
-    loss = -10 * np.log10(
-        power_coupling ** 2
+    loss_mode = -10 * np.log10(
+        power_coupling[1:] ** 2
     )  # 2X couplings per 90 degree bend vs radius (^2 for two)
+    loss_radiation = loss_per_bend[1:] - loss_per_bend[0]
+    loss_propagation = (
+        2 * 100 * 2 * np.pi * np.array(radius[1:]) / 4
+    )  # quarter turn propagation (assuming 2dB/cm)
 
     return dict(
         session=s,
         neff=neff,
-        radius_all=radius,
         radius=radius[1:],
-        loss=loss[1:],
-        loss_dB_m=loss_dB_m[1:],
-        loss_per_bend=loss_per_bend[1:],
+        loss_mode=loss_mode,
+        loss_propagation=loss_propagation,
+        loss_radiation=loss_radiation,
     )
 
 
-if __name__ == "__main__":
-    import lumapi
+def plot_waveguide_bend_loss(d):
+    """ bend loss (propagation and mode missmatch) for different bend radius
+    values are loaded from `waveguide_bend_loss` dictionary d
+    """
+    f, ax = plt.subplots()
+    plt.plot(
+        np.array(d["radius"]) * 1e6, abs(d["loss_mode"]), "o-", label="mode missmatch"
+    )
+    plt.plot(
+        np.array(d["radius"]) * 1e6,
+        abs(d["loss_propagation"]),
+        "o-",
+        label="propagation",
+    )
+    plt.plot(
+        np.array(d["radius"]) * 1e6, abs(d["loss_radiation"]), "o-", label="radiation"
+    )
+    plt.xlabel("bend radius (um)")
+    plt.ylabel("loss (dB)")
+    plt.legend()
+    return f, ax
 
-    s = lumapi.MODE()
-    d = waveguide_bend(session=s)
+
+if __name__ == "__main__":
+    # import lumapi
+    # s = lumapi.MODE()
+
+    d = waveguide_bend(cache=False)
+    plot_waveguide_bend_loss(d)
+    plt.show()
