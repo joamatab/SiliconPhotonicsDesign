@@ -10,6 +10,25 @@ from pylum.waveguide import waveguide
 @autoname
 def waveguide_bend(radius=np.array([2, 5]) * 1e-6, session=None, **kwargs):
     """ computes bend loss for waveguide bend radius
+
+    Args:
+        session: None
+        wg_width: 500e-9
+        wg_height: 220e-9
+        slab_height: 0
+        box_height: 2e-6
+        clad_height: 2e-6
+        margin_wg_height: 1e-6
+        margin_wg_width: 2e-6
+        substrate_height: 2e-6
+        material_wg: "si"
+        material_wafer: "si"
+        material_clad: "sio2"
+        material_box: "sio2"
+        wavelength: 1550e-9
+        mesh_size: 10e-9
+        modes: 4
+
     """
     s = waveguide(session=session, **kwargs)
     if 0 not in radius:
@@ -45,11 +64,12 @@ def waveguide_bend(radius=np.array([2, 5]) * 1e-6, session=None, **kwargs):
 
     return dict(
         session=s,
-        radius=radius,
-        loss=loss,
         neff=neff,
-        loss_dB_m=loss_dB_m,
-        loss_per_bend=loss_per_bend,
+        radius_all=radius,
+        radius=radius[1:],
+        loss=loss[1:],
+        loss_dB_m=loss_dB_m[1:],
+        loss_per_bend=loss_per_bend[1:],
     )
 
 

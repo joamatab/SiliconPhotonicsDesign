@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from pylum.autoname import autoname
+from pylum.config import materials
 
 
 def waveguide(
@@ -16,16 +17,45 @@ def waveguide(
     margin_wg_height=1e-6,
     margin_wg_width=2e-6,
     substrate_height=2e-6,
-    material_wg="Si (Silicon) - Palik",
-    material_wafer="Si (Silicon) - Palik",
-    material_clad="SiO2 (Glass) - Palik",
-    material_box="SiO2 (Glass) - Palik",
+    material_wg="si",
+    material_wafer="si",
+    material_clad="sio2",
+    material_box="sio2",
     wavelength=1550e-9,
     mesh_size=10e-9,
     modes=4,
 ):
     """ draws a waveguide 2D mode solver
+
+    Args:
+        session: None
+        wg_width: 500e-9
+        wg_height: 220e-9
+        slab_height: 0
+        box_height: 2e-6
+        clad_height: 2e-6
+        margin_wg_height: 1e-6
+        margin_wg_width: 2e-6
+        substrate_height: 2e-6
+        material_wg: "si"
+        material_wafer: "si"
+        material_clad: "sio2"
+        material_box: "sio2"
+        wavelength: 1550e-9
+        mesh_size: 10e-9
+        modes: 4
+
     """
+
+    for material in [material_wg, material_box, material_clad, material_wafer]:
+        if material not in materials:
+            raise ValueError(f"{material} not in {list(materials.keys())}")
+
+    material_wg = materials[material_wg]
+    material_wafer = materials[material_wafer]
+    material_clad = materials[material_clad]
+    material_box = materials[material_box]
+
     import lumapi
 
     s = session or lumapi.MODE(hide=False)

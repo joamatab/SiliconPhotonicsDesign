@@ -16,6 +16,7 @@ import numpy as np
 from pylum.autoname import autoname
 from pylum.autoname import get_function_name
 from pylum.config import CONFIG
+from pylum.config import materials
 
 
 @autoname
@@ -30,8 +31,10 @@ def gc2d(
     box_height=2e-6,
     clad_height=2e-6,
     substrate_height=2e-6,
-    material="Si (Silicon) - Palik",
-    material_clad="SiO2 (Glass) - Palik",
+    material_wg="si",
+    material_wafer="si",
+    material_clad="sio2",
+    material_box="sio2",
     gc_xmin=-3e-6,
     fiber_angle_deg=20,
     wavelength=1550e-9,
@@ -43,6 +46,15 @@ def gc2d(
     gap_width_list overrides (period, ff and n_gratings)
 
     """
+    for material in [material_wg, material_box, material_clad, material_wafer]:
+        if material not in materials:
+            raise ValueError(f"{material} not in {list(materials.keys())}")
+
+    material_wg = materials[material_wg]
+    material_wafer = materials[material_wafer]
+    material_clad = materials[material_clad]
+    material_box = materials[material_box]
+
     import lumapi
 
     assert ff < 1, f"fill factor {ff:.3f} is the ratio of period/maxHeigh"
@@ -72,7 +84,7 @@ def gc2d(
 
     s.addrect()
     s.set("name", "GC_base")
-    s.set("material", material)
+    s.set("material", material_wg)
     s.set("x min", gc_xmin)
     s.set("x max", (n_gratings + 1) * period + gc_xmin)
     s.set("y", 0.5 * (wg_height - etch_depth))
@@ -85,7 +97,7 @@ def gc2d(
     for gap, width in gap_width_list:
         s.addrect()
         s.set("name", "GC_tooth")
-        s.set("material", material)
+        s.set("material", material_wg)
         s.set("y min", 0)
         s.set("y max", wg_height)
         s.set("x min", xmin + gap)
@@ -97,7 +109,7 @@ def gc2d(
     # draw silicon substrate;
     s.addrect()
     s.set("name", "substrate")
-    s.set("material", material)
+    s.set("material", material_wafer)
     s.set("x max", 30e-6)
     s.set("x min", -20e-6)
     s.set("y", -1 * (box_height + 0.5 * substrate_height))
@@ -107,7 +119,7 @@ def gc2d(
     s.addrect()
     # draw burried oxide;
     s.set("name", "BOX")
-    s.set("material", material_clad)
+    s.set("material", material_box)
     s.set("x max", 30e-6)
     s.set("x min", -20e-6)
     s.set("y min", -box_height)
@@ -119,7 +131,7 @@ def gc2d(
     s.addrect()
     # draw waveguide;
     s.set("name", "WG")
-    s.set("material", material)
+    s.set("material", material_wg)
     s.set("x min", -20e-6)
     s.set("x max", gc_xmin)
     s.set("y min", 0)
@@ -176,8 +188,6 @@ def write_sparameters(
         draw_function:
         dirpath: where to store all the simulation files
         overwrite: run even if simulation exists
-
-    Kwargs:
         period (m): 0.66e-6
         ff: 0.5 fill factor
         n_gratings: 50
@@ -187,8 +197,10 @@ def write_sparameters(
         box_height: 2e-6
         clad_height: 2e-6
         substrate_height: 2e-6
-        material: "Si (Silicon) - Palik"
-        material_clad: "SiO2 (Glass) - Palik"
+        material_wg: "si"
+        material_wafer: "si"
+        material_clad: "sio2"
+        material_box: "sio2"
         wavelength: 1550e-9
         wavelength_span: 0.3e-6
         gc_xmin: 3e-6
