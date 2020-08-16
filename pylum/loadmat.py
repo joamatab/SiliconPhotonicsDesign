@@ -50,8 +50,6 @@ def write_dict(d, filepath="results.json"):
 
 
 def test_loadmat():
-    from pylum.grating_coupler import sparameters
-
     matlab_file_path = (
         CONFIG["repo_path"] / "workspace" / "grating_coupler_sweep" / "results.mat"
     )
