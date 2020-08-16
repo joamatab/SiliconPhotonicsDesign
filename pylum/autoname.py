@@ -4,7 +4,13 @@ from inspect import signature
 
 import numpy as np
 
+from pylum.cache import read_cache
+from pylum.cache import write_cache
+from pylum.config import CONFIG
+
 MAX_NAME_LENGTH = 255
+
+ignore_keys = ["session", "base_fsp_path"]
 
 
 def get_function_name(function_name, **kwargs):
@@ -12,10 +18,11 @@ def get_function_name(function_name, **kwargs):
 
     suffix = []
     for key in sorted(kwargs):
-        value = kwargs[key]
-        key = join_first_letters(key)
-        value = clean_value(value)
-        suffix += [f"{key.upper()}{value}"]
+        if key not in ignore_keys:
+            value = kwargs[key]
+            key = join_first_letters(key)
+            value = clean_value(value)
+            suffix += [f"{key.upper()}{value}"]
     suffix = "_".join(suffix)
 
     if kwargs:
@@ -38,7 +45,7 @@ def dict2name(prefix=None, **kwargs):
 
 
 def clean_name(name):
-    """ Ensures that names are composed of [a-zA-Z0-9]
+    """Ensures that names are composed of [a-zA-Z0-9]
 
     FIXME: only a few characters are currently replaced.
         This function has been updated only on case-by-case basis
@@ -59,7 +66,7 @@ def clean_name(name):
 
 
 def clean_value(value):
-    """ returns more readable value (integer)
+    """returns more readable value (integer)
     if number is < 1:
         returns number units in nm (integer)
     """
@@ -75,9 +82,9 @@ def clean_value(value):
             value = f"{int(value/1e3)}K"
         elif 1 > value > 1e-3:
             value = f"{int(value*1e3)}m"
-        elif 1e-6 < value < 1e-3:
+        elif 2e-6 <= value < 1e-3:
             value = f"{int(value*1e6)}u"
-        elif 1e-9 < value < 1e-6:
+        elif 1e-9 < value < 2e-6:
             value = f"{int(value*1e9)}n"
         elif 1e-12 < value < 1e-9:
             value = f"{int(value*1e12)}p"
@@ -104,7 +111,7 @@ def join_first_letters(name):
 
 
 def autoname(function):
-    """ decorator for auto-naming pylum functions
+    """decorator for auto-naming functions
     if no Keyword argument `name`  is passed it creates a name by concenating all Keyword arguments
 
     .. plot::
@@ -127,19 +134,48 @@ def autoname(function):
         if args:
             raise ValueError("autoname supports only Keyword args")
         name = kwargs.pop("name", get_function_name(function.__name__, **kwargs))
+        cache = kwargs.pop("cache", True)
 
-        simdict = function(**kwargs)
+        sig = signature(function)
+        if "args" not in sig.parameters and "kwargs" not in sig.parameters:
+            for key in kwargs.keys():
+                assert (
+                    key in sig.parameters.keys()
+                ), f"{key} key not in {list(sig.parameters.keys())}"
+
+        filepath = CONFIG["workspace"] / f"{name}.h5"
+
+        if cache and filepath.exists():
+            # simdict = dict(results=read_cache(filepath))
+            results = read_cache(filepath)
+            simdict = {k: v[()] for k, v in results.items()}
+
+        else:
+            simdict = function(**kwargs)
+            write_cache(simdict, filepath)
         simdict["name"] = name
-        simdict["name_function"] = function.__name__
+        simdict["function_name"] = function.__name__
+        settings = kwargs.copy()
+
+        settings.update(**{p.name: p.default for p in sig.parameters.values()})
+        simdict["settings"] = settings
+        simdict["settings"].pop("session", "")
         return simdict
 
     return wrapper
 
 
 @autoname
-def _dummy(plot=True, length=3, wg_width=0.5):
-    c = dict()
-    return c
+def _dummy(
+    plot=True,
+    length=3,
+    wg_width=0.5,
+    radius=[2e-3, 3e-3],
+    material_wg="Si (Silicon) - Palik",
+):
+    d = dict(string="Hello!", array=np.array([1, 2, 3]))
+    print("im running")
+    return d
 
 
 def test_autoname():
@@ -152,7 +188,9 @@ def test_autoname():
 
 
 def test_clean_value():
-    print(clean_value(2.222222))
+    print(clean_value(1.55))
+    print(clean_value(2e-6))
+    # print(clean_value(2.222222))
     # print(clean_value(0.5))
     # print(clean_value(2e-6))
     # print(clean_value(2e-9))
@@ -173,5 +211,9 @@ def test_clean_name():
 if __name__ == "__main__":
     # print(clean_name("mode_solver(:_=_2852"))
     # print(clean_value(0.5))
-    test_autoname()
+    # test_autoname()
     # test_clean_value()
+    # print(_dummy(radius = [1e-3, 5e-3])['name'])
+    # print(_dummy(cache=False, material_wg="SiO2 (Glass) - Palik")["name"])
+    # print(_dummy(cache=False, material_wg="SiO2 (Glass) - Palik"))
+    print(_dummy(material_wg="SiO2 (Glass) - Palik")["results"].keys())

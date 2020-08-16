@@ -6,6 +6,7 @@ __pycache__/
 # C extensions
 *.so
 *.h5
+*.fsp
 
 # Distribution / packaging
 .Python
@@ -18,6 +19,7 @@ eggs/
 lib/
 lib64/
 parts/
+extra/
 sdist/
 var/
 wheels/
@@ -25,7 +27,6 @@ share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-MANIFEST
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -47,7 +48,6 @@ htmlcov/
 nosetests.xml
 coverage.xml
 *.cover
-*.py,cover
 .hypothesis/
 .pytest_cache/
 cover/
@@ -144,3 +144,4 @@ cython_debug/
 *Thumbs.db
 
 samples/workspace
+workspace
