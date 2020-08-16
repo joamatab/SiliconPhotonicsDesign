@@ -20,7 +20,7 @@ def get_install_requires():
 
 setup(
     name="pylum",
-    version="0.0.1",
+    version="0.0.2",
     url="https://github.com/joamatab/SiliconPhotonicsDesign",
     license="MIT",
     author="Joaquin",

@@ -8,7 +8,7 @@ from pylum.run import run_mode
 from pylum.write_scripts import mkdir
 from pylum.write_scripts import write_scripts
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 __author__ = "Joaquin <j>"
 __all__ = [
     "CONFIG",
