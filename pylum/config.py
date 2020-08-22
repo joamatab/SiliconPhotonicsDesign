@@ -45,6 +45,8 @@ CONFIG["grating_coupler"] = repo_path / "templates" / "fiber_coupler"
 CONFIG["grating_coupler_2D"] = CONFIG["grating_coupler"] / "grating_coupler_2D.fsp"
 CONFIG["grating_coupler_2D_base"] = CONFIG["grating_coupler"] / "grating_base.fsp"
 CONFIG["dbr"] = repo_path / "templates" / "dbr" / "dbr_cell.fsp"
+CONFIG["dbr2"] = repo_path / "templates" / "dbr" / "dbr_cell2.fsp"
+CONFIG["dbr3"] = repo_path / "templates" / "dbr" / "dbr3.fsp"
 CONFIG["materials"] = repo_path / "templates" / "waveguide" / "materials.lsf"
 
 CONFIG["workspace"].mkdir(exist_ok=True)

@@ -1,0 +1,62 @@
+###########################################################################
+# Bragg Grating Bandstructure Calculation
+# Extracts the central wavelength and bandgap of bragg grating unitcell
+#      - Uses bandstructure analysis group
+#      - Bandgap occurs at edge of first Brillouin zone (kx = pi/period)
+# Exports data to MATLAB
+
+# Two Unitcell Types
+#    - Rectangular grating
+#    - Sinusoidal gratings
+
+# Ajay Mistry, UBC, February 2018
+
+#############################################################################
+#cd("C:\KLayout_Simulations\Band Structure\Bragg");
+switchtolayout;
+
+# Simulation time:
+# May have to adjust length of simulation time based on grating strength
+sim_time = 1e-15*(2500);
+
+# Define structure;
+period = 318e-9;
+width=5e-07;
+delta = 80e-9;
+
+# Choose rib or ridge waveguide
+slab = 0;
+
+#Choose Unit Cell Type
+sinusoidal = 0; #0 for rectangular, 1 for sinusoidal
+
+setnamed("::model","ax",period);
+setnamed("::model","width",width);
+setnamed("::model","delta",delta);
+setnamed("::model","slab",slab);
+setnamed("::model","sinusoidal",sinusoidal);
+select("FDTD"); setview("extent");  # zoom to extent
+
+filename = 'Bragg_W'+num2str(width*1e9)+'nm_dw'+num2str(delta*1e9)+'nm_P'+num2str(period*1e9)+'nm_Sine'+num2str(sinusoidal);
+#newdir = '"mkdir '+filename+'"';
+#system(newdir);
+#save(pwd+'/'+filename+'/'+filename+".fsp");
+
+
+# Run simulation
+select("FDTD"); set("simulation time", sim_time);  # zoom to extent
+#run;
+
+#Extract central wavelength and bandwidth
+spectrum = getresult('bandstructure','spectrum');
+fs = spectrum.fs;
+f = spectrum.f;
+lambda = spectrum.lambda;
+
+peaks = findpeaks(fs,2);
+lambda1 = c/f(peaks(1));
+lambda2 = c/f(peaks(2));
+?lambda0 = (lambda1+lambda2)/2;
+?bandwidth = abs(lambda2-lambda1);
+
+#matlabsave(filename, period, width, delta, bandwidth, lambda0);
