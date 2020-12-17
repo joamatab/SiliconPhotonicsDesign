@@ -12,9 +12,15 @@ from pylum.waveguide import waveguide
 
 @autoname
 def waveguide_bend(radius=np.array([3, 5, 10]) * 1e-6, session=None, **kwargs):
-    """ computes bend loss for waveguide bend radius
+    """Computes bend loss for waveguide bend radius.
+
+    Bend losses are caused by:
+    - radiation (absorbed by PML)
+    - propagation loss
+    - 2 mode missmatchs from the radial to straight and back to radial
 
     Args:
+        radius: waveguide bend radius (m)
         session: None
         wg_width: 500e-9
         wg_height: 220e-9
@@ -89,7 +95,7 @@ def waveguide_bend(radius=np.array([3, 5, 10]) * 1e-6, session=None, **kwargs):
 
 
 def plot_waveguide_bend_loss(d):
-    """ bend loss (propagation and mode missmatch) for different bend radius
+    """bend loss (propagation and mode missmatch) for different bend radius
     values are loaded from `waveguide_bend_loss` dictionary d
     """
     f, ax = plt.subplots()

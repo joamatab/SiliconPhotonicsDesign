@@ -133,8 +133,8 @@ def autoname(function):
     def wrapper(*args, **kwargs):
         if args:
             raise ValueError("autoname supports only Keyword args")
-        name = kwargs.pop("name", get_function_name(function.__name__, **kwargs))
         cache = kwargs.pop("cache", True)
+        name = kwargs.pop("name", get_function_name(function.__name__, **kwargs))
 
         sig = signature(function)
         if "args" not in sig.parameters and "kwargs" not in sig.parameters:
@@ -152,6 +152,9 @@ def autoname(function):
 
         else:
             simdict = function(**kwargs)
+            assert isinstance(
+                simdict, dict
+            ), f"Function {function.name} needs to return a dict"
             write_cache(simdict, filepath)
         simdict["name"] = name
         simdict["function_name"] = function.__name__

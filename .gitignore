@@ -6,7 +6,9 @@ __pycache__/
 # C extensions
 *.so
 *.h5
+*.csv
 *.fsp
+backup_for*
 
 # Distribution / packaging
 .Python
