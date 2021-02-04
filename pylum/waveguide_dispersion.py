@@ -11,6 +11,7 @@ from pylum.waveguide import waveguide
 
 @autoname
 def waveguide_dispersion(
+    waveguide_function=waveguide,
     wavelength=1.55e-6,
     mode_number=1,
     nmodes=5,
@@ -47,7 +48,7 @@ def waveguide_dispersion(
         ng: group index
 
     """
-    s = waveguide(session=session, wavelength=wavelength, **kwargs)
+    s = waveguide_function(session=session, wavelength=wavelength, **kwargs)
 
     s.run()
     s.setanalysis("wavelength", wavelength)
