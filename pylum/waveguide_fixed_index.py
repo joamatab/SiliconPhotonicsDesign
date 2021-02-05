@@ -2,7 +2,7 @@
 """
 
 
-def waveguide(
+def waveguide_fixed_index(
     session=None,
     wg_width=500e-9,
     wg_height=220e-9,
@@ -11,13 +11,10 @@ def waveguide(
     clad_height=2e-6,
     margin_wg_height=1e-6,
     margin_wg_width=2e-6,
-    substrate_height=2e-6,
     nclad=1.44,
     nbox=1.44,
     nwg=3.47,
     nwafer=3.47,
-    material_clad=1.44,
-    material_box=1.44,
     wavelength=1550e-9,
     mesh_size=10e-9,
     modes=4,
@@ -150,4 +147,4 @@ if __name__ == "__main__":
     import lumapi
 
     s = lumapi.MODE()
-    s = waveguide(session=s)
+    s = waveguide_fixed_index(session=s)

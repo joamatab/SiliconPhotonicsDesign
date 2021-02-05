@@ -1,4 +1,4 @@
-"""Compute and plot group and effective index over wavelength
+"""Compute and plot group and effective index over wavelength.
 """
 import matplotlib.pyplot as plt
 import numpy as np
@@ -43,9 +43,10 @@ def waveguide_dispersion(
         modes: 4
 
     Returns:
-        wavelengths: for detailed dispersion calculation
-        neff: effective index iterable (includes zero)
-        ng: group index
+        Dict: wavelengths, neff, ng
+            wavelengths: for detailed dispersion calculation
+            neff: effective index iterable (includes zero)
+            ng: group index
 
     """
     s = waveguide_function(session=session, wavelength=wavelength, **kwargs)
@@ -135,12 +136,22 @@ def plot_waveguide_dispersion(d):
 
 
 if __name__ == "__main__":
-    neffs, ngs = wim_paper()
-    plt.show()
+    from pylum.waveguide_fixed_index import waveguide_fixed_index
+
+    # neffs, ngs = wim_paper()
+    # plt.show()
 
     # neff, ng = get_neff_ng(wg_width=440e-9)
     # print(neff)
     # print(ng)
-    # d = waveguide_dispersion(wg_width=500e-9)
-    # plot_waveguide_dispersion(d)
-    # plt.show()
+
+    wg_width = 450e-9
+    d = waveguide_dispersion(wg_width=wg_width)
+    plot_waveguide_dispersion(d)
+
+    d2 = waveguide_dispersion(
+        wg_width=wg_width, waveguide_function=waveguide_fixed_index
+    )
+    plot_waveguide_dispersion(d2)
+
+    plt.show()

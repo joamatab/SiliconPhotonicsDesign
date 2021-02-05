@@ -12,7 +12,6 @@ def waveguide(
     clad_height=2e-6,
     margin_wg_height=1e-6,
     margin_wg_width=2e-6,
-    substrate_height=2e-6,
     material_wg="si",
     material_wafer="si",
     material_clad="sio2",
@@ -32,7 +31,6 @@ def waveguide(
         clad_height: 2e-6
         margin_wg_height: 1e-6
         margin_wg_width: 2e-6
-        substrate_height: 2e-6
         material_wg: "si"
         material_wafer: "si"
         material_clad: "sio2"
