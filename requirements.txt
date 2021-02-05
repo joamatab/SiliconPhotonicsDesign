@@ -3,4 +3,5 @@ jinja2
 matplotlib
 numpy
 h5py
+pandas
 pytest-regressions
