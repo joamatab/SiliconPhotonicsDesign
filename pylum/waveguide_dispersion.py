@@ -124,13 +124,13 @@ def plot_waveguide_dispersion(d):
     values are loaded from `waveguide_ng` dictionary d
     """
     plt.figure()
-    w = d["wavelengths"] * 1e9
-    plt.plot(w[:-1], abs(d["neff"]))
+    wavelength = d["wavelengths"] * 1e9
+    plt.plot(wavelength[:-1], abs(d["neff"]))
     plt.xlabel("wavelengths (nm)")
     plt.ylabel("neff)")
 
     plt.figure()
-    plt.plot(w, abs(d["ng"]))
+    plt.plot(wavelength, abs(d["ng"]))
     plt.xlabel("wavelengths (nm)")
     plt.ylabel("ng)")
 
